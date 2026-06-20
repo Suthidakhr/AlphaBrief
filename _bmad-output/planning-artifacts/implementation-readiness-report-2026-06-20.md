@@ -1,20 +1,20 @@
 ---
 date: 2026-06-20
-project_name: AlphaBrief
+project_name: ASK (Aware Signals & Knowledge)
 stepsCompleted: [1, 2, 3, 4, 5, 6]
 documentsInventoried:
-  prd: "prds/prd-AlphaBrief-2026-06-20/prd.md"
+  prd: "prds/prd-ASK-2026-06-20/prd.md"
   architecture: "architecture.md"
   epics: "epics.md"
-  ux_design: "ux-designs/ux-AlphaBrief-2026-06-20/DESIGN.md"
-  ux_experience: "ux-designs/ux-AlphaBrief-2026-06-20/EXPERIENCE.md"
+  ux_design: "ux-designs/ux-ASK-2026-06-20/DESIGN.md"
+  ux_experience: "ux-designs/ux-ASK-2026-06-20/EXPERIENCE.md"
   project_context: "../../project-context.md"
 ---
 
 # Implementation Readiness Assessment Report
 
 **Date:** 2026-06-20
-**Project:** AlphaBrief
+**Project:** ASK (Aware Signals & Knowledge)
 
 ---
 

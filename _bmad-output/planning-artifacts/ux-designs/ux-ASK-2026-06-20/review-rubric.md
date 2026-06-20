@@ -1,4 +1,4 @@
-# Spine Pair Review — AlphaBrief
+# Spine Pair Review — ASK
 
 _Reviewed against: design-example-editorial.md (shape reference), experience-example-shadcn.md (shape reference), prd.md (UJ/FR source of truth). Date: 2026-06-20._
 

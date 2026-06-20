@@ -1,5 +1,5 @@
 ---
-name: AlphaBrief Design System
+name: ASK (Aware Signals & Knowledge) Design System
 status: final
 created: 2026-06-20
 updated: 2026-06-20
@@ -77,11 +77,11 @@ components:
 
 ## Brand & Style
 
-AlphaBrief is a financial research assistant for Thai retail investors. The visual identity is built around a single metaphor: **reading financial research over morning coffee**. This shapes every decision — warmth over clinical precision, calm authority over urgent alerts, approachable depth over overwhelming data density.
+ASK is a financial research assistant for Thai retail investors. The visual identity is built around a single metaphor: **reading financial research over morning coffee**. This shapes every decision — warmth over clinical precision, calm authority over urgent alerts, approachable depth over overwhelming data density.
 
 The product sits deliberately between Bloomberg (too complex, too cold) and TradingView (too chart-heavy, too overwhelming) on the approachability spectrum. It does not look like a trading terminal. It looks like a premium financial editorial product.
 
-**Design philosophy:** AlphaBrief is a financial research companion, not a trading platform. Every design decision is filtered through five principles: **Clarity · Trust · Context · Readability · Calm decision support**. The product helps users understand the market; the final investment decision is always theirs. Explicitly avoided: prediction language, trading signals, recommendation wording, urgency-driven design patterns (red flashes, countdown timers, "act now" copy).
+**Design philosophy:** ASK is a financial research companion, not a trading platform. Every design decision is filtered through five principles: **Clarity · Trust · Context · Readability · Calm decision support**. The product helps users understand the market; the final investment decision is always theirs. Explicitly avoided: prediction language, trading signals, recommendation wording, urgency-driven design patterns (red flashes, countdown timers, "act now" copy).
 
 **Identity markers:**
 - Warm espresso palette anchored in the navigation chrome
@@ -97,7 +97,7 @@ The product sits deliberately between Bloomberg (too complex, too cold) and Trad
 
 ### Surface Hierarchy
 
-AlphaBrief uses four stacked surface levels. Espresso fills are confined to nav and the Daily Brief header — never used as general content fills.
+ASK uses four stacked surface levels. Espresso fills are confined to nav and the Daily Brief header — never used as general content fills.
 
 | Surface | Token | Hex | Usage |
 |---|---|---|---|
@@ -218,13 +218,13 @@ Fixed-height bar immediately below the navbar. Horizontal auto-scroll (CSS marqu
 
 ## Elevation & Depth
 
-AlphaBrief uses **border-defined surfaces**, not shadow-defined surfaces. Shadows appear only on hover to signal interactivity.
+ASK uses **border-defined surfaces**, not shadow-defined surfaces. Shadows appear only on hover to signal interactivity.
 
 | State | Treatment |
 |---|---|
 | Default card | `1px solid {khaki}` border, no shadow |
 | Hovered card | `box-shadow: 0 4px 16px rgba(74,52,42,0.10)` |
-| Focused element | `box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #4A342A` (espresso outer ring, white offset) — 12.5:1 on any AlphaBrief surface |
+| Focused element | `box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #4A342A` (espresso outer ring, white offset) — 12.5:1 on any ASK surface |
 | Navbar | Bottom border `1px solid rgba(215,201,184,0.15)` |
 
 No deeply layered shadows. Depth is communicated through surface color hierarchy (`linen-deep` → `white` → `linen`) rather than drop shadows.

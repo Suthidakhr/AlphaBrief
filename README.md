@@ -1,8 +1,10 @@
-# AlphaBrief
+# ASK — Aware Signals & Knowledge
 
-AI-powered financial research platform for Thai retail investors. AlphaBrief aggregates financial news, generates per-article AI impact analysis, groups related articles into market themes, and delivers a daily market brief — all without requiring users to read dozens of articles.
+> *From news to understanding.*
 
-> **What AlphaBrief is not:** An investment advisory service, a trading recommendation system, or a real-time execution tool. Every AI-generated surface displays a non-removable compliance disclaimer.
+AI-powered financial research companion for Thai retail investors. ASK (Aware Signals & Knowledge) aggregates financial news, generates per-article AI impact analysis, groups related articles into market themes, and delivers a daily market brief — all without requiring users to read dozens of articles.
+
+> **What ASK is not:** An investment advisory service, a trading recommendation system, or a real-time execution tool. Every AI-generated surface displays a non-removable compliance disclaimer.
 
 ---
 
@@ -101,7 +103,7 @@ App available at `http://localhost:3000`
 ## Project Structure
 
 ```
-AlphaBrief/
+ASK/
 ├── frontend/
 │   └── src/
 │       ├── app/                  # Next.js App Router pages
@@ -313,8 +315,8 @@ User accounts · Portfolio tracking · Native mobile apps · Push notifications 
 
 Full planning documentation is in [`_bmad-output/planning-artifacts/`](./_bmad-output/planning-artifacts/):
 
-- [`prds/prd-AlphaBrief-2026-06-20/prd.md`](./_bmad-output/planning-artifacts/prds/prd-AlphaBrief-2026-06-20/prd.md) — Product Requirements
+- [`prds/prd-ASK-2026-06-20/prd.md`](./_bmad-output/planning-artifacts/prds/prd-ASK-2026-06-20/prd.md) — Product Requirements
 - [`architecture.md`](./_bmad-output/planning-artifacts/architecture.md) — Architecture decisions
 - [`epics.md`](./_bmad-output/planning-artifacts/epics.md) — 6 epics, 26 stories with acceptance criteria
-- [`ux-designs/ux-AlphaBrief-2026-06-20/DESIGN.md`](./_bmad-output/planning-artifacts/ux-designs/ux-AlphaBrief-2026-06-20/DESIGN.md) — Visual identity
-- [`ux-designs/ux-AlphaBrief-2026-06-20/EXPERIENCE.md`](./_bmad-output/planning-artifacts/ux-designs/ux-AlphaBrief-2026-06-20/EXPERIENCE.md) — Behavioral specs
+- [`ux-designs/ux-ASK-2026-06-20/DESIGN.md`](./_bmad-output/planning-artifacts/ux-designs/ux-ASK-2026-06-20/DESIGN.md) — Visual identity (DESIGN.md spine)
+- [`ux-designs/ux-ASK-2026-06-20/EXPERIENCE.md`](./_bmad-output/planning-artifacts/ux-designs/ux-ASK-2026-06-20/EXPERIENCE.md) — Behavioral specs (EXPERIENCE.md spine)

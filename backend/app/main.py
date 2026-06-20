@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers import news, market, trends
 
 app = FastAPI(
-    title="AlphaBrief API",
-    description="AI Financial Research Assistant — News, Market Data & Trend Analysis",
+    title="ASK API",
+    description="ASK (Aware Signals & Knowledge) — From news to understanding. AI financial research companion for Thai retail investors.",
     version="1.0.0",
 )
 
@@ -23,7 +23,7 @@ app.include_router(trends.router)
 
 @app.get("/")
 async def root():
-    return {"service": "AlphaBrief API", "version": "1.0.0", "status": "ok"}
+    return {"service": "ASK API", "version": "1.0.0", "status": "ok"}
 
 
 @app.get("/health")

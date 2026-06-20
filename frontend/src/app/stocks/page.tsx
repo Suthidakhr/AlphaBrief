@@ -79,7 +79,7 @@ export default async function StocksPage() {
       <footer className="border-t mt-8 px-6 py-5 flex items-center justify-between text-xs"
         style={{ backgroundColor: "#4A342A", borderColor: "rgba(215,201,184,0.1)", color: "rgba(215,201,184,0.4)" }}>
         <div className="flex items-center gap-2">
-          <span className="font-bold text-sm" style={{ color: "#D7C9B8" }}>AlphaBrief</span>
+          <span className="font-bold text-sm" style={{ color: "#D7C9B8" }}>ASK</span>
           <span>·</span>
           <span>AI Financial Research Assistant</span>
         </div>

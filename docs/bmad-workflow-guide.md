@@ -1,6 +1,6 @@
 # From Idea to Implementation-Ready: The BMAD Workflow
 
-**A case study using AlphaBrief — written for my future self, my friends, and anyone transitioning from vibe coding to structured AI-assisted development.**
+**A case study using ASK (Aware Signals & Knowledge) — written for my future self, my friends, and anyone transitioning from vibe coding to structured AI-assisted development.**
 
 ---
 
@@ -12,16 +12,16 @@
 
 ---
 
-## The Project: AlphaBrief
+## The Project: ASK — Aware Signals & Knowledge
 
-AlphaBrief is an AI-powered financial research platform for Thai retail investors. It aggregates financial news, generates per-article AI impact analysis, groups articles into market themes, and delivers a daily market brief — all without requiring users to read dozens of articles.
+ASK is an AI-powered financial research platform for Thai retail investors. It aggregates financial news, generates per-article AI impact analysis, groups articles into market themes, and delivers a daily market brief — all without requiring users to read dozens of articles.
 
 **Why I chose this project for my first BMAD run:**
 
 1. **It's real.** This isn't a toy. Thai retail investors genuinely lack AI-powered market tools compared to US-centric options like Bloomberg or Seeking Alpha.
 2. **It has compliance constraints.** Anything touching financial information and AI needs disclaimers, WCAG accessibility, and careful error states. These are the exact pressures that expose gaps in vibe-coded products.
 3. **It has multiple system components.** A frontend (Next.js), a backend (FastAPI), an orchestration layer (n8n), and an AI model (Claude) — all talking to each other via webhooks. Complexity reveals whether your planning is actually good.
-4. **I already had a bootstrapped codebase.** BMAD works for both new projects (greenfield) and existing ones (brownfield). AlphaBrief was brownfield — the scaffold existed but the planning hadn't happened. This is the most common real-world situation.
+4. **I already had a bootstrapped codebase.** BMAD works for both new projects (greenfield) and existing ones (brownfield). ASK was brownfield — the scaffold existed but the planning hadn't happened. This is the most common real-world situation.
 
 ---
 
@@ -63,7 +63,7 @@ Each step produces a document. Each document is a versioned artifact committed t
 
 **Skill:** `bmad-create-prd`
 **Input:** Your product idea (brain dump, notes, conversation)
-**Output:** `_bmad-output/planning-artifacts/prds/prd-AlphaBrief-2026-06-20/prd.md`
+**Output:** `_bmad-output/planning-artifacts/prds/prd-ASK-2026-06-20/prd.md`
 
 ### What this agent does
 
@@ -76,7 +76,7 @@ The PRD agent interviews you like a product manager who needs to write a specifi
 - What are the non-functional requirements? (Performance, reliability, compliance, accessibility)
 - What are the open questions that could block development?
 
-### What AlphaBrief's PRD produced
+### What ASK's PRD produced
 
 - **29 Functional Requirements** across 5 domains (news aggregation, AI analysis, market trends, daily brief, navigation/UX)
 - **14 Non-Functional Requirements** (performance, reliability, data integrity, AI output standards, compliance, accessibility)
@@ -101,7 +101,7 @@ When Lek opens the Energy category on his phone and finds the OPEC news item —
 
 The architecture agent reads your PRD, surveys your existing code, and produces a decision document — not a diagram collection. Every decision is justified by a specific requirement it serves.
 
-For AlphaBrief, the key decisions were:
+For ASK, the key decisions were:
 
 | Decision | Requirement it serves |
 |---|---|
@@ -114,7 +114,7 @@ For AlphaBrief, the key decisions were:
 
 ### The brownfield addition
 
-Because AlphaBrief's codebase already existed, the architecture doc also captured **what was missing**: the testing infrastructure. Vitest + React Testing Library for the frontend; pytest + pytest-asyncio for the backend. This became Epic 1.
+Because ASK's codebase already existed, the architecture doc also captured **what was missing**: the testing infrastructure. Vitest + React Testing Library for the frontend; pytest + pytest-asyncio for the backend. This became Epic 1.
 
 ### Why this matters
 
@@ -238,7 +238,7 @@ This is an independent validation run (not self-review). Six steps:
 5. **Epic quality review** — checks for technical epics, forward dependencies, vague ACs
 6. **Final assessment** — readiness verdict with specific blockers
 
-### AlphaBrief's result
+### ASK's result
 
 **READY for Epics 1–2.** Implementation can begin immediately.
 
@@ -417,7 +417,7 @@ Day 10+   bmad-dev-story (one story at a time)
 
 ---
 
-## Quick Reference: BMAD Skills Used for AlphaBrief
+## Quick Reference: BMAD Skills Used for ASK
 
 | Skill | Role | Key Output |
 |---|---|---|
@@ -434,15 +434,15 @@ Day 10+   bmad-dev-story (one story at a time)
 ## Where to Find Everything
 
 ```
-AlphaBrief/
+ASK/
 ├── README.md                                    ← Start here
 ├── _bmad-output/
 │   ├── project-context.md                       ← 91 critical implementation rules
 │   └── planning-artifacts/
-│       ├── prds/prd-AlphaBrief-2026-06-20/
+│       ├── prds/prd-ASK-2026-06-20/
 │       │   └── prd.md                           ← Product Requirements
 │       ├── architecture.md                      ← Architecture decisions
-│       ├── ux-designs/ux-AlphaBrief-2026-06-20/
+│       ├── ux-designs/ux-ASK-2026-06-20/
 │       │   ├── DESIGN.md                        ← Visual identity (authoritative)
 │       │   ├── EXPERIENCE.md                    ← Behavioral specs (authoritative)
 │       │   └── validation-report.html           ← UX validation findings
@@ -454,4 +454,4 @@ AlphaBrief/
 
 ---
 
-*Written 2026-06-20 · AlphaBrief case study · BMAD Method v6.8.0*
+*Written 2026-06-20 · ASK case study · BMAD Method v6.8.0*

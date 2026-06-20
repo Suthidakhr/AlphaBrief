@@ -15,12 +15,12 @@ export default function N8nChat() {
       createChat({
         webhookUrl: 'https://stdkn.app.n8n.cloud/webhook/596bf97f-155d-4b22-a964-669953f19238/chat',
         initialMessages: [
-          'สวัสดีครับ! ผมคือ AlphaBrief AI',
+          'สวัสดีครับ! ผมคือ ASK AI',
           'ถามได้เลยครับ เช่น วิเคราะห์หุ้น PTT, สรุปข่าวพลังงานวันนี้, หรือแนวโน้มตลาด',
         ],
         i18n: {
           en: {
-            title: 'AlphaBrief AI',
+            title: 'ASK AI',
             subtitle: 'ผู้ช่วย AI ด้านการเงินและการลงทุน',
             footer: '',
             getStarted: 'เริ่มสนทนา',

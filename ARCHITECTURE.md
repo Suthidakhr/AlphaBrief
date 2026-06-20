@@ -1,6 +1,6 @@
-# AlphaBrief — Technical Architecture
+# ASK (Aware Signals & Knowledge) — Technical Architecture
 
-> AI Financial Research Assistant | หลักการทำงานและการเชื่อมต่อระบบ
+> AI Financial Research Companion | From news to understanding. | หลักการทำงานและการเชื่อมต่อระบบ
 
 ---
 

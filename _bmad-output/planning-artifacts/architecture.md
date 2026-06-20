@@ -1,10 +1,10 @@
 ---
 stepsCompleted: [1, 2, 3]
 inputDocuments:
-  - "_bmad-output/planning-artifacts/prds/prd-AlphaBrief-2026-06-20/prd.md"
+  - "_bmad-output/planning-artifacts/prds/prd-ASK-2026-06-20/prd.md"
   - "_bmad-output/project-context.md"
 workflowType: 'architecture'
-project_name: 'AlphaBrief'
+project_name: 'ASK (Aware Signals & Knowledge)'
 user_name: 'Suthidakhrueanak'
 date: '2026-06-20'
 ---
@@ -81,7 +81,7 @@ Architecturally, there are **three distinct write paths** (news ingestion → n8
 
 ### Assessment: Project Already Bootstrapped
 
-The AlphaBrief codebase is not a new project. Both the frontend and backend are already standing with meaningful code:
+The ASK codebase is not a new project. Both the frontend and backend are already standing with meaningful code:
 
 | Layer | Status | What exists |
 |---|---|---|

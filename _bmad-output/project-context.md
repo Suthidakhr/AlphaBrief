@@ -1,5 +1,5 @@
 ---
-project_name: 'AlphaBrief'
+project_name: 'ASK (Aware Signals & Knowledge)'
 user_name: 'Suthidakhrueanak'
 date: '2026-06-20'
 sections_completed: ['technology_stack', 'language_rules', 'framework_rules', 'testing_rules', 'code_quality_rules', 'workflow_rules', 'critical_rules']

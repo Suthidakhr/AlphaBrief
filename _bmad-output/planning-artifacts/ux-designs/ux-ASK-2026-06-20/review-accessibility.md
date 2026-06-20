@@ -1,5 +1,5 @@
 ---
-name: Accessibility Review — AlphaBrief
+name: Accessibility Review — ASK
 type: review
 created: 2026-06-20
 reviewer: WCAG 2.1 AA automated audit (claude-sonnet-4-6)
@@ -8,7 +8,7 @@ sources:
   - EXPERIENCE.md
 ---
 
-# Accessibility Review — AlphaBrief
+# Accessibility Review — ASK
 
 ## Overall verdict
 

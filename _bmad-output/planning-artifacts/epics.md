@@ -1,18 +1,18 @@
 ---
 stepsCompleted: [1, 2, 3]
 inputDocuments:
-  - "_bmad-output/planning-artifacts/prds/prd-AlphaBrief-2026-06-20/prd.md"
+  - "_bmad-output/planning-artifacts/prds/prd-ASK-2026-06-20/prd.md"
   - "_bmad-output/planning-artifacts/architecture.md"
-  - "_bmad-output/planning-artifacts/ux-designs/ux-AlphaBrief-2026-06-20/DESIGN.md"
-  - "_bmad-output/planning-artifacts/ux-designs/ux-AlphaBrief-2026-06-20/EXPERIENCE.md"
+  - "_bmad-output/planning-artifacts/ux-designs/ux-ASK-2026-06-20/DESIGN.md"
+  - "_bmad-output/planning-artifacts/ux-designs/ux-ASK-2026-06-20/EXPERIENCE.md"
   - "_bmad-output/project-context.md"
 ---
 
-# AlphaBrief - Epic Breakdown
+# ASK (Aware Signals & Knowledge) — Epic Breakdown
 
 ## Overview
 
-This document provides the complete epic and story breakdown for AlphaBrief, decomposing the requirements from the PRD, UX Design specs (DESIGN.md + EXPERIENCE.md), and Architecture decisions into implementable stories.
+This document provides the complete epic and story breakdown for ASK, decomposing the requirements from the PRD, UX Design specs (DESIGN.md + EXPERIENCE.md), and Architecture decisions into implementable stories.
 
 ---
 
@@ -236,7 +236,7 @@ Real financial news flows into the platform automatically via n8n, and each arti
 **NFRs covered:** NFR-R01, NFR-P03, NFR-AI01, NFR-AI02
 
 ### Epic 4: Daily Market Brief
-Users open AlphaBrief each morning to find an AI-generated summary of overnight market developments at the top of the home page — the daily anchor that drives return visits and delivers UJ-1 (Nam's morning brief journey).
+Users open ASK each morning to find an AI-generated summary of overnight market developments at the top of the home page — the daily anchor that drives return visits and delivers UJ-1 (Nam's morning brief journey).
 **FRs covered:** FR-D01, FR-D02, FR-D03, FR-D04, FR-D05
 
 ### Epic 5: Market Trends & Themes
@@ -599,7 +599,7 @@ So that I can understand the full evidence base for a market theme before formin
 ### Story 5.4: Theme Clustering Webhook & n8n Scheduling
 
 As the n8n/AI pipeline,
-I want to push AI-identified market theme clusters into AlphaBrief via a webhook endpoint on a daily schedule,
+I want to push AI-identified market theme clusters into ASK via a webhook endpoint on a daily schedule,
 So that the Trends page reflects the freshest thematic groupings each morning.
 
 **Acceptance Criteria:**
@@ -640,7 +640,7 @@ So that the Trends page reflects the freshest thematic groupings each morning.
 
 ## Epic 4: Daily Market Brief
 
-Users open AlphaBrief each morning to find an AI-generated market overview at the top of the home page — the daily anchor that delivers UJ-1 (Nam's morning brief journey) and drives return visits.
+Users open ASK each morning to find an AI-generated market overview at the top of the home page — the daily anchor that delivers UJ-1 (Nam's morning brief journey) and drives return visits.
 
 ### Story 4.1: Daily Brief Schema & API Endpoint
 
@@ -730,7 +730,7 @@ So that I understand the day's market narrative in under 30 seconds before readi
 ### Story 4.3: Daily Brief Ingestion Webhook & n8n Scheduling
 
 As the n8n orchestration system,
-I want to push the AI-generated Daily Brief into AlphaBrief each morning via a webhook endpoint,
+I want to push the AI-generated Daily Brief into ASK each morning via a webhook endpoint,
 So that a fresh brief is available for users by the time they open the app after 07:00 Bangkok time.
 
 **Acceptance Criteria:**
@@ -769,7 +769,7 @@ So that a fresh brief is available for users by the time they open the app after
 ### Story 4.4: Home Page Integration — DailyBriefCard as Primary Entry Point
 
 As a retail investor,
-I want the Daily Brief to appear at the top of the page when I open AlphaBrief,
+I want the Daily Brief to appear at the top of the page when I open ASK,
 So that I am oriented to the market the moment the page loads — before I read any individual articles.
 
 **Acceptance Criteria:**
@@ -803,12 +803,12 @@ So that I am oriented to the market the moment the page loads — before I read 
 
 ## Epic 3: News & AI Analysis Ingestion Pipeline
 
-Real financial news flows into AlphaBrief automatically via n8n, and each article receives AI-generated analysis within 5 minutes — the platform transitions from mock data to a live, self-updating product.
+Real financial news flows into ASK automatically via n8n, and each article receives AI-generated analysis within 5 minutes — the platform transitions from mock data to a live, self-updating product.
 
 ### Story 3.1: News Ingestion Webhook Endpoint
 
 As the n8n orchestration system,
-I want to push ingested news articles into AlphaBrief via a FastAPI webhook endpoint,
+I want to push ingested news articles into ASK via a FastAPI webhook endpoint,
 So that news items appear in the feed automatically within 30 minutes of publication without manual intervention.
 
 **Acceptance Criteria:**
@@ -852,7 +852,7 @@ So that news items appear in the feed automatically within 30 minutes of publica
 ### Story 3.2: AI Analysis Delivery Webhook Endpoint
 
 As the n8n/Claude pipeline,
-I want to push AI-generated analysis for a news article into AlphaBrief via a FastAPI webhook endpoint,
+I want to push AI-generated analysis for a news article into ASK via a FastAPI webhook endpoint,
 So that analysis becomes available within 5 minutes of ingestion and the UI transitions from pending state to full insight.
 
 **Acceptance Criteria:**
@@ -1043,7 +1043,7 @@ So that I can switch between sections from any page with a single interaction.
 **Given** the Navbar renders on desktop (≥ 1024px)
 **When** the page loads
 **Then** it is `56px` tall, espresso background, sticky with `z-50`
-**And** it shows: AlphaBrief logo left → four nav tabs center (Home / News / Trends / About) → live Bangkok time clock + LIVE badge right
+**And** it shows: ASK logo left → four nav tabs center (Home / News / Trends / About) → live Bangkok time clock + LIVE badge right
 **And** the active tab has a `2px khaki (#D7C9B8) border-bottom` and khaki text
 **And** each tab's Thai sub-label has `aria-hidden="true"` at 90% opacity — the English label is the accessible text
 

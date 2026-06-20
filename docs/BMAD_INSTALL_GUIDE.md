@@ -1,6 +1,6 @@
 # BMAD METHOD — Installation Guide
 
-**Project:** AlphaBrief  
+**Project:** ASK  
 **Date:** 2026-06-20  
 **BMAD Version:** 6.8.0  
 **Node.js:** v20+ required  
@@ -27,7 +27,7 @@ BMAD METHOD is an AI-driven Agile framework that installs agent personas, skills
 ## Step 1 — Navigate to Project Root
 
 ```bash
-cd /Users/suthidakhrueanak/project/AlphaBrief
+cd /Users/suthidakhrueanak/project/ASK
 ```
 
 ---
@@ -43,7 +43,7 @@ npx bmad-method@latest install \
   --tools claude-code \
   --yes \
   --set core.user_name=Suthida \
-  --set core.project_name=AlphaBrief \
+  --set core.project_name=ASK \
   --set core.communication_language=English \
   --set core.document_output_language=English \
   --set core.output_folder=_bmad-output
@@ -76,7 +76,7 @@ You should see this at the end of the install output:
 │    ✓  Help catalog                                                         │
 │    ✓  claude-code (44 skills → .claude/skills)                             │
 │                                                                            │
-│    Installed to: /Users/suthidakhrueanak/project/AlphaBrief/_bmad          │
+│    Installed to: /Users/suthidakhrueanak/project/ASK/_bmad          │
 ╰────────────────────────────────────────────────────────────────────────────╯
 ```
 
@@ -120,7 +120,7 @@ bmad-qa-generate-e2e-tests
 BMAD skills are loaded when Claude Code starts. After installation:
 
 1. **Open a new terminal**
-2. Navigate to the project: `cd /Users/suthidakhrueanak/project/AlphaBrief`
+2. Navigate to the project: `cd /Users/suthidakhrueanak/project/ASK`
 3. Launch Claude Code: `claude`
 4. Type `/bmad-help` — it should appear in autocomplete
 
@@ -160,7 +160,7 @@ npx bmad-method@latest install \
   --tools claude-code \
   --yes \
   --set core.user_name=Suthida \
-  --set core.project_name=AlphaBrief \
+  --set core.project_name=ASK \
   --set core.communication_language=English \
   --set core.document_output_language=English \
   --set core.output_folder=_bmad-output
@@ -173,7 +173,7 @@ Then open a new Claude Code session to reload the updated skills.
 ## File Structure After Installation
 
 ```
-AlphaBrief/
+ASK/
 ├── _bmad/                        ← BMAD core (config, agents, scripts)
 │   ├── config.toml               ← Main config (project name, language, output folder)
 │   ├── config.user.toml          ← User config (your name, communication language)

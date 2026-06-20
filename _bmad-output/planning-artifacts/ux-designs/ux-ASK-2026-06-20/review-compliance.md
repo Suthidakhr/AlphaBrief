@@ -1,4 +1,4 @@
-# Financial Compliance Review — AlphaBrief
+# Financial Compliance Review — ASK
 
 ## Overall verdict
 

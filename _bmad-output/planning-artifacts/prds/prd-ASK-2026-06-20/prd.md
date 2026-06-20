@@ -1,11 +1,14 @@
 ---
-title: AlphaBrief — Product Requirements Document
+title: ASK — Product Requirements Document
 status: draft
 created: 2026-06-20
 updated: 2026-06-20
+tagline: "From news to understanding."
 ---
 
-# AlphaBrief — Product Requirements Document
+# ASK (Aware Signals & Knowledge) — Product Requirements Document
+
+> *From news to understanding.*
 
 **Version:** Draft 1.0
 **Date:** 2026-06-20
@@ -34,15 +37,15 @@ AI has made per-article impact analysis, sentiment classification, and thematic 
 
 ### Product Vision
 
-AlphaBrief is the fastest way for a retail investor to understand what is happening in the market and why it matters — without reading dozens of articles.
+ASK is the fastest way for a retail investor to understand what is happening in the market and why it matters — without reading dozens of articles.
 
-### What AlphaBrief Is
+### What ASK Is
 
 - A financial research and market intelligence platform
 - A reading assistant that surfaces impact and meaning, not just headlines
 - A daily briefing layer on top of financial news
 
-### What AlphaBrief Is Not
+### What ASK Is Not
 
 - An investment advisory service
 - A trading recommendation system
@@ -85,7 +88,7 @@ Thai market coverage (SET-listed stocks and Thai macroeconomic events) is a firs
 
 **Protagonist:** Nam, 34, marketing manager in Bangkok. Invests in Thai tech stocks and US ETFs. Has 10 minutes over coffee before work.
 
-Nam opens AlphaBrief on her desktop. The Daily Brief loads immediately at the top — three key market developments from overnight, an overall sentiment label (Bearish), and two highlighted risks. She reads the second item about Fed rate signals: a 3-sentence AI summary says short-term bond yields are likely to rise, with Banks rated negative and Technology rated neutral for impact. She scans the sentiment badges in the news feed below — mostly neutral, one bearish item in Energy she flags mentally. She closes the browser in 8 minutes. She has not read a single full article, but she feels informed enough to decide not to act today.
+Nam opens ASK on her desktop. The Daily Brief loads immediately at the top — three key market developments from overnight, an overall sentiment label (Bearish), and two highlighted risks. She reads the second item about Fed rate signals: a 3-sentence AI summary says short-term bond yields are likely to rise, with Banks rated negative and Technology rated neutral for impact. She scans the sentiment badges in the news feed below — mostly neutral, one bearish item in Energy she flags mentally. She closes the browser in 8 minutes. She has not read a single full article, but she feels informed enough to decide not to act today.
 
 **What must work:** Daily Brief loads without waiting; sentiment is visually scannable at a glance; individual analysis is readable in under 30 seconds.
 
@@ -95,7 +98,7 @@ Nam opens AlphaBrief on her desktop. The Daily Brief loads immediately at the to
 
 **Protagonist:** Lek, 27, software engineer. Recently bought shares in a renewable energy ETF after hearing about global energy trends. Heard an OPEC announcement on the radio during his commute.
 
-Lek opens AlphaBrief on his phone (mobile browser) and navigates to the Energy category. He finds the OPEC news item near the top, with a Bearish sentiment badge. He reads the AI impact summary: "OPEC's surprise production cut signals continued supply restriction. Short-term: upward pressure on oil prices, negative for energy-importing economies. Affected sectors: Energy (bearish short-term), Consumer Goods (bearish, rising input costs)." He does not fully understand what "energy-importing economy" means, but he understands the practical implication. He decides not to sell, based on the neutral long-term label. He closes the app in 4 minutes.
+Lek opens ASK on his phone (mobile browser) and navigates to the Energy category. He finds the OPEC news item near the top, with a Bearish sentiment badge. He reads the AI impact summary: "OPEC's surprise production cut signals continued supply restriction. Short-term: upward pressure on oil prices, negative for energy-importing economies. Affected sectors: Energy (bearish short-term), Consumer Goods (bearish, rising input costs)." He does not fully understand what "energy-importing economy" means, but he understands the practical implication. He decides not to sell, based on the neutral long-term label. He closes the app in 4 minutes.
 
 **What must work:** Category filtering surfaces the right article; AI summary is written in plain language without jargon; sentiment is immediately visible on the card; mobile layout is functional.
 
@@ -105,7 +108,7 @@ Lek opens AlphaBrief on his phone (mobile browser) and navigates to the Energy c
 
 **Protagonist:** Wanida, 42, accountant. Actively manages a Thai stock portfolio. Wants to understand the technology sector before the SET opens Monday morning.
 
-Wanida opens AlphaBrief on her desktop on Sunday evening. She navigates to the Trends view and finds an AI-identified theme: "AI Hardware Demand Cycle — 6 related articles." She expands it and reads two summaries. One item notes: "Affected Thai stocks: DELTA, HANA" — she makes a mental note to review her DELTA position. She checks the Technology category filter and sees 4 more articles from the past 48 hours, two of which are already covered by the theme. She spends 12 minutes instead of 45, with a clear sense of the narrative shaping the sector.
+Wanida opens ASK on her desktop on Sunday evening. She navigates to the Trends view and finds an AI-identified theme: "AI Hardware Demand Cycle — 6 related articles." She expands it and reads two summaries. One item notes: "Affected Thai stocks: DELTA, HANA" — she makes a mental note to review her DELTA position. She checks the Technology category filter and sees 4 more articles from the past 48 hours, two of which are already covered by the theme. She spends 12 minutes instead of 45, with a clear sense of the narrative shaping the sector.
 
 **What must work:** Themes correctly group related articles; Thai stock identifiers appear in impact analysis; switching between Trends and category filtering is smooth.
 
@@ -282,7 +285,7 @@ Wanida opens AlphaBrief on her desktop on Sunday evening. She navigates to the T
 
 | Metric | Definition | Target |
 |---|---|---|
-| Time-to-insight | Average time for a test user to understand a news item's market impact using AlphaBrief vs. reading the source article | ≥ 40% reduction |
+| Time-to-insight | Average time for a test user to understand a news item's market impact using ASK vs. reading the source article | ≥ 40% reduction |
 | Daily Brief return | % of test users who return the next day after viewing the Daily Brief | ≥ 50% D1 retention |
 | Analysis pipeline reliability | % of ingested articles with AI analysis available within 5 minutes | ≥ 90% |
 | Sentiment accuracy | Error rate on manual spot-check of 20 items | < 15% incorrect |

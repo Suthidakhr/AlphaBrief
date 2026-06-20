@@ -36,8 +36,8 @@ export default function Navbar() {
             </svg>
           </div>
           <div>
-            <div className="text-base font-bold tracking-tight text-white leading-none">AlphaBrief</div>
-            <div className="text-xs leading-none mt-0.5" style={{ color: "rgba(215,201,184,0.55)" }}>AI Financial Research</div>
+            <div className="text-base font-bold tracking-tight text-white leading-none">ASK</div>
+            <div className="text-xs leading-none mt-0.5" style={{ color: "rgba(215,201,184,0.55)" }}>From news to understanding.</div>
           </div>
         </Link>
 

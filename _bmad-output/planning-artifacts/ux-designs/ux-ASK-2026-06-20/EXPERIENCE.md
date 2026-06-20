@@ -1,11 +1,11 @@
 ---
-name: AlphaBrief Experience Design
+name: ASK (Aware Signals & Knowledge) Experience Design
 status: final
 created: 2026-06-20
 updated: 2026-06-20
 design_reference: DESIGN.md
 sources:
-  - _bmad-output/planning-artifacts/prds/prd-AlphaBrief-2026-06-20/prd.md
+  - _bmad-output/planning-artifacts/prds/prd-ASK-2026-06-20/prd.md
   - _bmad-output/planning-artifacts/architecture.md
   - _bmad-output/project-context.md
 ---
@@ -29,7 +29,7 @@ sources:
 Four top-level sections. Navigation is persistent on desktop (top navbar) and mobile (bottom tab bar).
 
 ```
-AlphaBrief
+ASK
 ├── Overview (Home)
 │   ├── Daily Brief card           ← primary anchor
 │   ├── News feed (all categories) ← primary content
@@ -90,7 +90,7 @@ Five principles (Clarity · Trust · Context · Readability · Calm decision sup
 
 ## Voice and Tone
 
-AlphaBrief speaks like a knowledgeable colleague who read the news before you woke up — not like a compliance notice, not like a trading desk alert.
+ASK speaks like a knowledgeable colleague who read the news before you woke up — not like a compliance notice, not like a trading desk alert.
 
 **Calm authority:** Statements are definitive but measured. "Fed rate signals push bond yields to a 4-month high" — not "BREAKING: Fed shocks markets."
 
@@ -291,7 +291,7 @@ If a category genuinely has no articles (e.g., no Thai Stocks news on a weekend)
 
 **Desktop:**
 - Top navbar: sticky, `z-50`. Active tab: `2px border-bottom camel`. Transition: `color 0.15s`.
-- Clicking the AlphaBrief logo navigates to `/`.
+- Clicking the ASK logo navigates to `/`.
 
 **Mobile:**
 - Bottom tab bar: fixed, `z-50`. Four tabs: Overview / News / Stocks / Trends. Active: khaki icon + text + `2px border-top`. Safe area inset respected (`pb-safe`).
@@ -332,7 +332,7 @@ All behavioral — visual contrast and color specs live in `DESIGN.md`.
 
 **Screen reader:** NewsCards and ThemeCards use `<article>` element. Sentiment badge: `aria-label="Market sentiment: bearish"`. Stock impact badges: `aria-label="[SYMBOL]: rising"` / `"[SYMBOL]: falling"` / `"[SYMBOL]: unchanged"` — the `▲`/`▼` arrow must not be announced by screen readers. Ticker bar: `aria-hidden="true"` (decorative marquee; category navigation is available via the News filter bar). Navigation landmark roles (`<header>`, `<nav>`, `<main>`, `<footer>`). AI insight box: `aria-label="AI market analysis"` or a visually-hidden heading. Search input: `aria-label="Search news, stocks, and sectors"` (explicit label; placeholder alone is not accessible). Category filter row: `role="tablist"` on container, `role="tab"` + `aria-selected="true/false"` on each tab, left/right arrow keys to move focus within the group. Thai subtitle text: `aria-hidden="true"` (duplicates the English label which is already announced).
 
-**Focus indicators:** Visible focus ring on all interactive elements. `box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #4A342A` (espresso outer ring with white offset) — 12.5:1 contrast on any AlphaBrief surface, exceeds WCAG 1.4.11 3:1 requirement.
+**Focus indicators:** Visible focus ring on all interactive elements. `box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #4A342A` (espresso outer ring with white offset) — 12.5:1 contrast on any ASK surface, exceeds WCAG 1.4.11 3:1 requirement.
 
 **Motion:** Ticker bar scroll, skeleton pulses, and the Analysis Pending animated dot all respect `prefers-reduced-motion`. All three pause/stop when preference is `reduce`. Card hover transitions (`0.2s shadow`) and nav transitions (`0.15s color`) are covered by a global `@media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; } }` rule.
 
@@ -346,9 +346,9 @@ All behavioral — visual contrast and color specs live in `DESIGN.md`.
 
 ### Flow 1 — The Morning Brief (Nam)
 
-**Protagonist:** Nam, 34, marketing manager in Bangkok. Invests in Thai tech stocks and US ETFs. Has 10 minutes over coffee before work. Opens AlphaBrief on desktop.
+**Protagonist:** Nam, 34, marketing manager in Bangkok. Invests in Thai tech stocks and US ETFs. Has 10 minutes over coffee before work. Opens ASK on desktop.
 
-1. **Landing:** Page loads. Navbar shows "AlphaBrief · AI Financial Research" + live Bangkok clock. Ticker bar scrolls below.
+1. **Landing:** Page loads. Navbar shows "ASK · AI Financial Research" + live Bangkok clock. Ticker bar scrolls below.
 2. **Daily Brief (gravity anchor):** Nam's eye lands on the espresso-header card in the sidebar: "AI Daily Brief · ภาพรวมตลาด — ● BEARISH." She reads the 2-sentence overview and two numbered key developments.
 3. **Feed scan:** She scrolls the left column. News cards show: bold headline + sentiment badge (top-right). She scans badges — mostly neutral, one BEARISH in Energy.
 4. **Card read:** She clicks the BEARISH Energy card. Detail page: headline → AI insight (2–3 sentences, no jargon) → sector impacts (Banks: negative, Technology: neutral) → source link → analysis timestamp → disclaimer.
@@ -360,7 +360,7 @@ All behavioral — visual contrast and color specs live in `DESIGN.md`.
 
 ### Flow 2 — The Impact Check (Lek)
 
-**Protagonist:** Lek, 27, software engineer. Recently bought into a renewable energy ETF. Heard OPEC news on his commute. Opens AlphaBrief on his phone.
+**Protagonist:** Lek, 27, software engineer. Recently bought into a renewable energy ETF. Heard OPEC news on his commute. Opens ASK on his phone.
 
 1. **Landing (mobile):** App opens on Overview. Daily Brief card is first — ● BEARISH today. He scrolls past it.
 2. **Tab navigation:** He taps "News" in the bottom tab bar. One tap.
@@ -377,7 +377,7 @@ All behavioral — visual contrast and color specs live in `DESIGN.md`.
 
 ### Flow 3 — The Sector Sweep (Wanida)
 
-**Protagonist:** Wanida, 42, accountant. Actively manages Thai stocks. Wants to understand the technology sector before SET opens Monday morning. Opens AlphaBrief on desktop Sunday evening.
+**Protagonist:** Wanida, 42, accountant. Actively manages Thai stocks. Wants to understand the technology sector before SET opens Monday morning. Opens ASK on desktop Sunday evening.
 
 1. **Landing:** She goes directly to the Trends section via the navbar.
 2. **Theme scan:** Trends page shows editorial theme cards — spacious, full descriptions. She spots: "AI Hardware Demand Cycle — 6 articles · ● BULLISH · Updated 4 hrs ago."
