@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>UX Design Validation: AlphaBrief</title>
+<style>
+  :root {
+    --bg: #fafaf9; --surface: #ffffff; --border: #e7e5e4; --text: #1c1917; --muted: #78716c;
+    --verdict-strong: #16a34a; --verdict-adequate: #65a30d; --verdict-thin: #d97706; --verdict-broken: #dc2626;
+    --sev-low: #64748b; --sev-medium: #ca8a04; --sev-high: #ea580c; --sev-critical: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; font-size: 15px; }
+  .container { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+  header.report-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+  .title h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .title .subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .synthesis { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--muted); border-radius: 8px; padding: 18px 22px; margin-bottom: 24px; font-size: 15.5px; }
+  .synthesis p { margin: 0 0 10px; }
+  .synthesis p:last-child { margin-bottom: 0; }
+  .dimension-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 24px; }
+  .dim-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+  .dim-card .dim-name { font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+  .dim-card .dim-verdict { font-size: 14px; font-weight: 600; }
+  section.dimension, section.reviewer-section { margin-bottom: 14px; }
+  section.dimension details, section.reviewer-section details { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  section summary { padding: 14px 20px; cursor: pointer; user-select: none; list-style: none; display: flex; align-items: center; gap: 12px; }
+  section summary::-webkit-details-marker { display: none; }
+  section summary::before { content: "▸"; display: inline-block; color: var(--muted); transition: transform 0.15s ease; }
+  section details[open] summary::before { transform: rotate(90deg); }
+  section summary h2 { display: inline; margin: 0; font-size: 16px; font-weight: 600; letter-spacing: -0.005em; flex: 1; }
+  .verdict-pill { font-size: 11px; padding: 3px 10px; border-radius: 999px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: white; }
+  .verdict-strong { background: var(--verdict-strong); }
+  .verdict-adequate { background: var(--verdict-adequate); }
+  .verdict-thin { background: var(--verdict-thin); }
+  .verdict-broken { background: var(--verdict-broken); }
+  .dim-body { padding: 4px 20px 14px; }
+  .dim-judgment { color: var(--text); font-size: 14.5px; }
+  .dim-judgment p { margin: 0 0 8px; }
+  .findings-list { padding: 0 20px 4px; }
+  article.finding { padding: 14px 0; border-top: 1px solid var(--border); }
+  article.finding:first-child { border-top: none; }
+  article.finding header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+  .badge { font-size: 10.5px; padding: 3px 8px; border-radius: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.4; }
+  .badge-sev-low { background: rgba(100,116,139,0.12); color: var(--sev-low); }
+  .badge-sev-medium { background: rgba(202,138,4,0.14); color: var(--sev-medium); }
+  .badge-sev-high { background: rgba(234,88,12,0.14); color: var(--sev-high); }
+  .badge-sev-critical { background: rgba(220,38,38,0.14); color: var(--sev-critical); }
+  .finding-title { margin: 0; font-size: 15px; font-weight: 500; flex: 1; min-width: 200px; }
+  .finding-location { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px; color: var(--muted); }
+  .finding-note, .finding-fix { margin-top: 6px; font-size: 14px; }
+  .finding-fix strong { color: var(--muted); font-weight: 500; }
+  .reviewer-source { font-size: 12px; color: var(--muted); font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .mechanical { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin-top: 24px; font-size: 14px; }
+  .mechanical h3 { margin: 0 0 10px; font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .mechanical ul { margin: 0; padding-left: 20px; }
+  .mechanical li { margin-bottom: 5px; }
+  footer.report-footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  footer .meta { display: flex; gap: 24px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header class="report-header">
+  <div class="title">
+    <h1>AlphaBrief — UX Design Validation Report</h1>
+    <div class="subtitle">_bmad-output/planning-artifacts/ux-designs/ux-AlphaBrief-2026-06-20/ · 3 reviewers · 2026-06-20</div>
+  </div>
+</header>
+
+<div class="synthesis">
+  <p>The spine pair is implementation-ready with targeted fixes required before development begins. DESIGN.md is structurally complete and follows canonical section order; EXPERIENCE.md covers all three user journeys with named protagonists, numbered steps, and climax beats. The critical issues split across two domains: <strong>four color contrast combinations fail WCAG 2.1 AA</strong> (the most pervasive being camel #B2967D used as text on white at 2.39:1), and <strong>two compliance gaps</strong> — the Theme Detail page has no AI disclaimer, and the Daily Brief card's disclaimer is specified as a navigation link rather than inline text, both violating FR-A04.</p>
+  <p>Five sidebar and page-level components (MarketOverviewWidget, SectorHeatmap, TrendSummary, News Detail page, Theme Detail page) have no behavioral spec and appear only in the IA tree. All three working mockups are orphaned — referenced nowhere in either spine. These are high-severity implementation blockers but require additions, not corrections. The color token architecture is sound; the contrast failures are in how tokens are assigned to text roles, not in the token values themselves. Fixing the text-role assignments (camel → cocoa for body text) and darkening the positive sentiment token resolves the contrast chain without changing the palette identity.</p>
+</div>
+
+<div class="dimension-summary">
+  <div class="dim-card"><div class="dim-name">Flow coverage</div><div class="dim-verdict" style="color:var(--verdict-adequate)">Adequate</div></div>
+  <div class="dim-card"><div class="dim-name">Token completeness</div><div class="dim-verdict" style="color:var(--verdict-strong)">Strong</div></div>
+  <div class="dim-card"><div class="dim-name">Component coverage</div><div class="dim-verdict" style="color:var(--verdict-thin)">Thin</div></div>
+  <div class="dim-card"><div class="dim-name">State coverage</div><div class="dim-verdict" style="color:var(--verdict-adequate)">Adequate</div></div>
+  <div class="dim-card"><div class="dim-name">Visual ref coverage</div><div class="dim-verdict" style="color:var(--verdict-broken)">Broken</div></div>
+  <div class="dim-card"><div class="dim-name">Bloat</div><div class="dim-verdict" style="color:var(--verdict-adequate)">Adequate</div></div>
+  <div class="dim-card"><div class="dim-name">Inheritance</div><div class="dim-verdict" style="color:var(--verdict-adequate)">Adequate</div></div>
+  <div class="dim-card"><div class="dim-name">Shape fit</div><div class="dim-verdict" style="color:var(--verdict-strong)">Strong</div></div>
+</div>
+
+<!-- ── 1. Flow coverage ── -->
+<section class="dimension">
+  <details>
+    <summary><h2>1. Flow coverage</h2><span class="verdict-pill verdict-adequate">Adequate</span></summary>
+    <div class="dim-body"><div class="dim-judgment"><p>All three PRD user journeys (UJ-1 Morning Brief / Nam, UJ-2 Impact Check / Lek, UJ-3 Sector Sweep / Wanida) are mapped with named protagonists, numbered steps, and explicit climax beats. Flows 2 and 3 lack failure paths for realistic edge cases (stale Energy feed; all themes archived at 48h).</p></div></div>
+    <div class="findings-list">
+      <article class="finding">
+        <header><span class="badge badge-sev-medium">Medium</span><h3 class="finding-title">Flow 2 missing failure path — stale Energy feed</h3><span class="finding-location">EXPERIENCE.md §Key Flows / Flow 2</span></header>
+        <div class="finding-note">Lek's journey assumes the OPEC article is in the Energy feed. FR-N06 / FR-UX07 make a stale or empty feed a realistic scenario. No failure branch specified.</div>
+        <div class="finding-fix"><strong>Fix:</strong> Add failure branch: "If Energy feed is stale (>60 min), amber staleness banner renders above feed. Lek sees the warning and checks the last-updated timestamp."</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-medium">Medium</span><h3 class="finding-title">Flow 3 missing failure path — empty Trends page</h3><span class="finding-location">EXPERIENCE.md §Key Flows / Flow 3</span></header>
+        <div class="finding-note">FR-T04 archives themes after 48h with no new articles. A Sunday-evening user (exactly Wanida's scenario) may find no active themes.</div>
+        <div class="finding-fix"><strong>Fix:</strong> Add failure branch: "If all themes are archived, Trends page shows an explicit empty state: 'No active themes today. Themes are refreshed daily at 07:00 Bangkok time.'"</div>
+      </article>
+    </div>
+  </details>
+</section>
+
+<!-- ── 2. Token completeness ── -->
+<section class="dimension">
+  <details>
+    <summary><h2>2. Token completeness</h2><span class="verdict-pill verdict-strong">Strong</span></summary>
+    <div class="dim-body"><div class="dim-judgment"><p>All 16 color tokens have hex values. All {path.to.token} references in the frontmatter components block resolve. One critical hex mismatch in prose (Do's section references stale pre-D-007 value). Typography scale is in prose tables only — no frontmatter tokens — acceptable since EXPERIENCE.md makes no {typography.*} path references.</p></div></div>
+    <div class="findings-list">
+      <article class="finding">
+        <header><span class="badge badge-sev-critical">Critical</span><h3 class="finding-title">Positive hex in Do's section is stale pre-D-007 value</h3><span class="finding-location">DESIGN.md §Do's and Don'ts</span></header>
+        <div class="finding-note">Do's section reads "Use green (positive: #2d6a4f)" — the old token value. Frontmatter correctly holds #16a34a. A developer copying from the Do's section will use the wrong green.</div>
+        <div class="finding-fix"><strong>Fix:</strong> Update Do's section to read "positive: #16a34a".</div>
+      </article>
+    </div>
+  </details>
+</section>
+
+<!-- ── 3. Component coverage ── -->
+<section class="dimension">
+  <details open>
+    <summary><h2>3. Component coverage</h2><span class="verdict-pill verdict-thin">Thin</span></summary>
+    <div class="dim-body"><div class="dim-judgment"><p>Ten core components have full visual + behavioral coverage. Five components appear only in the IA tree with no spec: MarketOverviewWidget, SectorHeatmap, TrendSummary, News Detail page, Theme Detail page. An architect building these surfaces has no behavioral contract beyond the IA content list.</p></div></div>
+    <div class="findings-list">
+      <article class="finding">
+        <header><span class="badge badge-sev-high">High</span><h3 class="finding-title">MarketOverviewWidget — no visual or behavioral spec</h3><span class="finding-location">EXPERIENCE.md §IA, DESIGN.md §Components</span></header>
+        <div class="finding-note">Referenced in IA and codebase. No anatomy, loading state, error state, or non-color indicator spec exists.</div>
+        <div class="finding-fix"><strong>Fix:</strong> Add minimal component spec: anatomy (index rows with name / price / change), direction indicator (▲/▼ non-color), loading skeleton, error state.</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-high">High</span><h3 class="finding-title">SectorHeatmap — no visual or behavioral spec; no non-color indicator</h3><span class="finding-location">EXPERIENCE.md §IA, DESIGN.md §Components</span></header>
+        <div class="finding-note">Listed as a sentiment color surface in DESIGN.md Colors section but has no component spec defining non-color indicators for the heatmap cells (required for WCAG 1.4.1).</div>
+        <div class="finding-fix"><strong>Fix:</strong> Add spec: cells show sector name + percentage change text (non-color indicator). Color intensity is secondary confirmation. Loading and error states.</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-high">High</span><h3 class="finding-title">TrendSummary — no visual or behavioral spec</h3><span class="finding-location">EXPERIENCE.md §IA, DESIGN.md §Components</span></header>
+        <div class="finding-fix"><strong>Fix:</strong> Add minimal spec: ranked theme list, sentiment badge per theme, click → Trends page. Loading and empty states.</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-high">High</span><h3 class="finding-title">News Detail page — IA content list only, no behavioral spec</h3><span class="finding-location">EXPERIENCE.md §IA (News Detail surface)</span></header>
+        <div class="finding-note">IA lists eight content elements. No layout order, no state specs (404, AI never arrives, stale analysis), no source attribution requirement beyond IA tree.</div>
+        <div class="finding-fix"><strong>Fix:</strong> Add News Detail page spec covering: content order, source name as non-nullable distinct text element, AI disclaimer placement, 404/not-found state, pending-analysis state.</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-high">High</span><h3 class="finding-title">Theme Detail page — IA content list only, no behavioral spec</h3><span class="finding-location">EXPERIENCE.md §IA (Theme Detail surface)</span></header>
+        <div class="finding-fix"><strong>Fix:</strong> Add Theme Detail page spec: constituent article list (NewsCard format), AI disclaimer (FR-A04), staleness indicators on constituent analyses, empty/error state.</div>
+      </article>
+    </div>
+  </details>
+</section>
+
+<!-- ── 4. State coverage ── -->
+<section class="dimension">
+  <details open>
+    <summary><h2>4. State coverage</h2><span class="verdict-pill verdict-adequate">Adequate</span></summary>
+    <div class="dim-body"><div class="dim-judgment"><p>Home, News feed, and DailyBriefCard states are thoroughly covered across five state types. News Detail, Trends, and Theme Detail surfaces have minimal or no state coverage. The amber staleness token referenced in prose is undefined in DESIGN.md frontmatter.</p></div></div>
+    <div class="findings-list">
+      <article class="finding">
+        <header><span class="badge badge-sev-high">High</span><h3 class="finding-title">News Detail page — no state coverage</h3><span class="finding-location">EXPERIENCE.md §State Patterns</span></header>
+        <div class="finding-note">No spec for: 404/article-not-found, cold-load skeleton, error loading AI analysis (never arrives vs. still pending), or stale-analysis rendering on the detail page (only the list-card version is covered).</div>
+        <div class="finding-fix"><strong>Fix:</strong> Add state row for News Detail: 404 → "Article not found" with back navigation; cold-load → skeleton blocks; AI analysis error → "Analysis unavailable" message with source link still accessible.</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-high">High</span><h3 class="finding-title">Trends / Theme Detail — zero state coverage</h3><span class="finding-location">EXPERIENCE.md §State Patterns</span></header>
+        <div class="finding-note">FR-T04 archives themes at 48h. A Sunday-evening Trends visit will likely render no active themes. No loading skeleton, error, or empty state is defined for either surface.</div>
+        <div class="finding-fix"><strong>Fix:</strong> Add: Trends empty state ("No active themes today — refreshed daily at 07:00 Bangkok time"), Trends error state, Theme Detail error (theme expired/deleted → redirect to Trends with explanation).</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-medium">Medium</span><h3 class="finding-title">Amber staleness token undefined in DESIGN.md</h3><span class="finding-location">EXPERIENCE.md §State Patterns / Stale Data, DESIGN.md frontmatter</span></header>
+        <div class="finding-note">EXPERIENCE.md calls amber/yellow "the only non-palette color in the system" but no amber token exists in DESIGN.md frontmatter. Developers will pick ad-hoc values.</div>
+        <div class="finding-fix"><strong>Fix:</strong> Add token: staleness: "#d97706" (amber-600) to DESIGN.md frontmatter colors block.</div>
+      </article>
+    </div>
+  </details>
+</section>
+
+<!-- ── 5. Visual reference coverage ── -->
+<section class="dimension">
+  <details open>
+    <summary><h2>5. Visual reference coverage</h2><span class="verdict-pill verdict-broken">Broken</span></summary>
+    <div class="dim-body"><div class="dim-judgment"><p>Three working mockup files exist in .working/ but are not referenced inline by either spine. A downstream architect or developer cannot discover them from the spine documents.</p></div></div>
+    <div class="findings-list">
+      <article class="finding">
+        <header><span class="badge badge-sev-high">High</span><h3 class="finding-title">All three working mockups are orphaned</h3><span class="finding-location">EXPERIENCE.md §Foundation or §IA</span></header>
+        <div class="finding-note">Files: .working/keyscreen-home-1.html (home layout), .working/card-hierarchy-1.html (card anatomy), .working/color-themes-1.html (color exploration). Neither spine links to them.</div>
+        <div class="finding-fix"><strong>Fix:</strong> Add to EXPERIENCE.md §Foundation: "→ Composition references: .working/keyscreen-home-1.html (home layout), .working/card-hierarchy-1.html (card hierarchy), .working/color-themes-1.html (color options). Spines win on conflict."</div>
+      </article>
+    </div>
+  </details>
+</section>
+
+<!-- ── 6. Bloat ── -->
+<section class="dimension">
+  <details>
+    <summary><h2>6. Bloat &amp; overspecification</h2><span class="verdict-pill verdict-adequate">Adequate</span></summary>
+    <div class="dim-body"><div class="dim-judgment"><p>Design Philosophy appears verbatim in both spines — a maintenance liability. Voice and Tone earns its place in EXPERIENCE.md (microcopy examples are unique there). No pixel-vs-token bloat beyond the acceptable prose type scale.</p></div></div>
+    <div class="findings-list">
+      <article class="finding">
+        <header><span class="badge badge-sev-medium">Medium</span><h3 class="finding-title">Design Philosophy duplicated across both spines</h3><span class="finding-location">DESIGN.md §Brand & Style, EXPERIENCE.md §Design Philosophy</span></header>
+        <div class="finding-note">Five principles and the "Explicitly avoided" list appear word-for-word in both files. An update to either requires updating both.</div>
+        <div class="finding-fix"><strong>Fix:</strong> Remove the Design Philosophy section from EXPERIENCE.md; replace with one line: "Design philosophy: five principles (Clarity · Trust · Context · Readability · Calm decision support) — see DESIGN.md §Brand &amp; Style."</div>
+      </article>
+    </div>
+  </details>
+</section>
+
+<!-- ── 7. Inheritance ── -->
+<section class="dimension">
+  <details>
+    <summary><h2>7. Inheritance discipline</h2><span class="verdict-pill verdict-adequate">Adequate</span></summary>
+    <div class="dim-body"><div class="dim-judgment"><p>Component names are consistent (PascalCase) across both spines and the decision log. Token names match between spines. UJ prefix diverges ("UJ-1" vs. "Flow 1") but protagonist names match, so cross-reference works. One unresolved naming split: nav label "Stocks" vs. surface name "Trends."</p></div></div>
+    <div class="findings-list">
+      <article class="finding">
+        <header><span class="badge badge-sev-medium">Medium</span><h3 class="finding-title">"Stocks" vs. "Trends" nav label / surface name split unresolved</h3><span class="finding-location">EXPERIENCE.md §IA, §Interaction Primitives / Bottom Tab Bar</span></header>
+        <div class="finding-note">Nav label reads "Stocks / หุ้น"; surface and component docs read "Trends" and "ThemeCard (Trends page)". An IA note acknowledges the conflict but doesn't resolve it. Stories written against "Stocks" will diverge from docs written against "Trends."</div>
+        <div class="finding-fix"><strong>Fix:</strong> Make a decision — "Trends / แนวโน้ม" accurately describes the content; "Stocks / หุ้น" fits user mental models. Pick one and align all nav labels, route names, surface names, and component docs to it.</div>
+      </article>
+    </div>
+  </details>
+</section>
+
+<!-- ── 8. Shape fit ── -->
+<section class="dimension">
+  <details>
+    <summary><h2>8. Shape fit</h2><span class="verdict-pill verdict-strong">Strong</span></summary>
+    <div class="dim-body"><div class="dim-judgment"><p>Both spines follow canonical section ordering exactly. All required EXPERIENCE.md sections present (Foundation, IA, Voice and Tone, Component Patterns, State Patterns, Interaction Primitives, Accessibility Floor, Key Flows, Responsive &amp; Platform). Design Philosophy is the one invented section — its content duplicates DESIGN.md but the section itself is structurally valid.</p></div></div>
+  </details>
+</section>
+
+<!-- ── Accessibility review ── -->
+<section class="reviewer-section">
+  <details open>
+    <summary><h2>Accessibility review (WCAG 2.1 AA)</h2><span class="reviewer-source">review-accessibility.md</span></summary>
+    <div class="dim-body"><div class="dim-judgment"><p>Accessibility intent is strong (non-color indicators, keyboard nav, landmarks, touch targets, motion preferences all addressed). Four contrast combinations fail WCAG 1.4.3; the camel-on-white failure (2.39:1) is pervasive because camel is assigned to text roles throughout the system. The fix is architectural: reassign text roles to cocoa (#7D5A44, ~5.1:1 on white) and reserve camel for accent/decorative use only.</p></div></div>
+    <div class="findings-list">
+      <article class="finding">
+        <header><span class="badge badge-sev-critical">Critical</span><h3 class="finding-title">Camel (#B2967D) on white (#FFFFFF) — 2.39:1, fails 4.5:1</h3><span class="finding-location">DESIGN.md §Colors/Accent Scale, §Typography, §Components (section labels, metadata, nav sub-labels)</span></header>
+        <div class="finding-note">Used pervasively: section labels (12px 600), source names, timestamps, AI insight box border area, category filter tabs.</div>
+        <div class="finding-fix"><strong>Fix:</strong> Designate camel as an accent color only (decorative borders, icons, large heading accents). Shift all normal-size text roles to cocoa (#7D5A44, ~5.1:1 on white). Update type scale table in DESIGN.md to specify cocoa for label/metadata text roles.</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-critical">Critical</span><h3 class="finding-title">Camel (#B2967D) on linen-deep (#EDE8E0) — 2.01:1, fails 4.5:1</h3><span class="finding-location">DESIGN.md §Colors, §Typography metadata row</span></header>
+        <div class="finding-fix"><strong>Fix:</strong> Use neutral-text (#78716c, 4.30:1 on linen-deep) or cocoa (#7D5A44, ~5.0:1 on linen-deep) for page-level metadata text on the deep linen background.</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-critical">Critical</span><h3 class="finding-title">Analysis pending state — camel at 60% opacity on linen (~1.6:1)</h3><span class="finding-location">EXPERIENCE.md §Analysis Pending</span></header>
+        <div class="finding-note">The pending-state text is specified as "camel at 60% opacity" — completely inaccessible. Opacity-based text must never be used for meaningful content states.</div>
+        <div class="finding-fix"><strong>Fix:</strong> Use cocoa (#7D5A44) at full opacity for pending-state text. The muted feel can be achieved through font-weight (400 vs 700) rather than opacity.</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-high">High</span><h3 class="finding-title">Positive (#16a34a) on positive-bg (#dcfce7) — 4.13:1, fails 4.5:1</h3><span class="finding-location">DESIGN.md §Colors/Sentiment Colors, §Components/SentimentBadge, tailwind.config.ts</span></header>
+        <div class="finding-note">Badge text at 9–11px bold doesn't qualify as large text; needs 4.5:1. Margin is small (0.37:1).</div>
+        <div class="finding-fix"><strong>Fix:</strong> Darken positive token to #15803d (Tailwind green-700, ~5.0:1 on #dcfce7). Update tailwind.config.ts and DESIGN.md frontmatter.</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-high">High</span><h3 class="finding-title">Neutral-text (#78716c) on white (#FFFFFF) — 4.30:1, fails 4.5:1</h3><span class="finding-location">DESIGN.md §Typography metadata row</span></header>
+        <div class="finding-note">Used for source names, timestamps, body text. Fails by 0.20:1. Borderline but technically non-compliant.</div>
+        <div class="finding-fix"><strong>Fix:</strong> Darken neutral-text to #6b6560 (~4.6:1 on white). Update token in DESIGN.md frontmatter and tailwind.config.ts.</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-high">High</span><h3 class="finding-title">Focus ring (camel at 35% opacity) ~1.3:1 — fails WCAG 1.4.11 UI component contrast (3:1)</h3><span class="finding-location">DESIGN.md §Elevation, EXPERIENCE.md §Accessibility Floor</span></header>
+        <div class="finding-fix"><strong>Fix:</strong> Replace with espresso-based focus ring: "box-shadow: 0 0 0 2px #4A342A" with a 2px white offset (box-shadow: 0 0 0 2px white, 0 0 0 4px #4A342A). Espresso on white = 12.5:1 — exceeds 3:1 on any AlphaBrief surface.</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-high">High</span><h3 class="finding-title">Stock badges — no aria-label pattern specified</h3><span class="finding-location">DESIGN.md §Components/NewsCard, EXPERIENCE.md §Component Patterns/NewsCard</span></header>
+        <div class="finding-note">Screen readers will announce "▲ PTT" as "triangle up PTT" — not "PTT: rising".</div>
+        <div class="finding-fix"><strong>Fix:</strong> Specify aria-label pattern: aria-label="PTT: rising" / "AAV: falling" / "DELTA: unchanged".</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-high">High</span><h3 class="finding-title">Search input — no label specification (placeholder only)</h3><span class="finding-location">EXPERIENCE.md §Search</span></header>
+        <div class="finding-fix"><strong>Fix:</strong> Add aria-label="Search news, stocks, and sectors" to the search input spec. Placeholder text disappears on focus and does not substitute for a label.</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-medium">Medium</span><h3 class="finding-title">SectorHeatmap and MarketOverview — no non-color indicators defined</h3><span class="finding-location">DESIGN.md §Colors/Sentiment Colors</span></header>
+        <div class="finding-fix"><strong>Fix:</strong> Heatmap cells must show percentage text (e.g., "+1.87%") alongside color fill. MarketOverview direction indicators must use ▲/▼/– arrows in addition to color. Define in new component specs.</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-medium">Medium</span><h3 class="finding-title">AI insight box — no accessible name for screen readers</h3><span class="finding-location">DESIGN.md §Components/AIInsightBox</span></header>
+        <div class="finding-fix"><strong>Fix:</strong> Add a visually-hidden heading or aria-label="AI market analysis" on the insight box container element.</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-medium">Medium</span><h3 class="finding-title">Category filter tab row — no ARIA role specification</h3><span class="finding-location">EXPERIENCE.md §Category Filter Bar</span></header>
+        <div class="finding-fix"><strong>Fix:</strong> Specify role="tablist" on container, role="tab" + aria-selected="true/false" on each tab, left/right arrow key navigation within the group.</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-medium">Medium</span><h3 class="finding-title">Thai subtitle text — effective contrast ~3.5:1 at 70% opacity on espresso</h3><span class="finding-location">DESIGN.md §Typography (Thai subtitle row), §Components/Navbar, §BottomTabBar</span></header>
+        <div class="finding-fix"><strong>Fix:</strong> Mark Thai subtitles aria-hidden="true" (they duplicate the English label already read aloud) and increase opacity to ≥90% visually.</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-low">Low</span><h3 class="finding-title">Analysis pending dot animation not listed under prefers-reduced-motion</h3><span class="finding-location">EXPERIENCE.md §Analysis Pending</span></header>
+        <div class="finding-fix"><strong>Fix:</strong> Add: "The animated dot respects prefers-reduced-motion: reduce — renders as static when motion is reduced."</div>
+      </article>
+    </div>
+  </details>
+</section>
+
+<!-- ── Compliance review ── -->
+<section class="reviewer-section">
+  <details open>
+    <summary><h2>Financial compliance review</h2><span class="reviewer-source">review-compliance.md</span></summary>
+    <div class="dim-body"><div class="dim-judgment"><p>Sentiment color enforcement (data-layer), error/empty state rules (explicit timestamped messages), staleness thresholds, and the financial language prohibition are all well-covered. Two critical gaps: Theme Detail page has no AI disclaimer (FR-A04 requires it on every analysis surface); and the Daily Brief card spec describes a "disclaimer link" rather than inline text, which does not satisfy FR-A04's structural rendering requirement.</p></div></div>
+    <div class="findings-list">
+      <article class="finding">
+        <header><span class="badge badge-sev-critical">Critical</span><h3 class="finding-title">Theme Detail page — no AI disclaimer specified</h3><span class="finding-location">EXPERIENCE.md §IA (/trends/[id]), EXPERIENCE.md §Component Patterns (ThemeCard)</span></header>
+        <div class="finding-note">FR-A04: every surface rendering AI-generated analysis must include the disclaimer as non-removable. Theme Detail renders both the theme description and constituent article analyses.</div>
+        <div class="finding-fix"><strong>Fix:</strong> Add "AI disclaimer (non-removable)" to the Theme Detail IA entry and to the ThemeCard component spec for the detail page view.</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-critical">Critical</span><h3 class="finding-title">Daily Brief card disclaimer specified as "link" — must be inline text</h3><span class="finding-location">DESIGN.md §Components/DailyBriefCard</span></header>
+        <div class="finding-note">DESIGN.md DailyBriefCard footer reads "disclaimer link" — implying a hyperlink to About. FR-A04: if analysis renders, the disclaimer renders. A navigation link does not satisfy this.</div>
+        <div class="finding-fix"><strong>Fix:</strong> Change to "inline disclaimer text (non-removable)" and quote FR-D05 canonical string verbatim.</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-high">High</span><h3 class="finding-title">News Detail source attribution ambiguous — publisher name not explicitly required</h3><span class="finding-location">EXPERIENCE.md §IA (News Detail surface)</span></header>
+        <div class="finding-note">IA entry says "Headline + source link" — a bare hyperlink on the headline would satisfy "source link" but violate NFR-D01 (publisher name non-nullable).</div>
+        <div class="finding-fix"><strong>Fix:</strong> Update to: "Headline + source name (non-nullable, visible text) + link to original article (non-nullable)."</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-high">High</span><h3 class="finding-title">Staleness indicator not specified for Theme Detail constituent article analyses</h3><span class="finding-location">EXPERIENCE.md §Component Patterns / ThemeCard (detail view)</span></header>
+        <div class="finding-note">FR-A06 applies to all AI analysis displays. Constituent articles on a Theme Detail page may have stale analyses; no indicator is specified.</div>
+        <div class="finding-fix"><strong>Fix:</strong> Add staleness rule to constituent article rendering on Theme Detail: same 24h amber indicator as on the News Detail page.</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-medium">Medium</span><h3 class="finding-title">Canonical disclaimer strings not quoted verbatim in either spine</h3><span class="finding-location">EXPERIENCE.md §Voice and Tone / Microcopy, DESIGN.md §Components/Disclaimer</span></header>
+        <div class="finding-note">FR-A04 and FR-D05 have slightly different canonical strings. EXPERIENCE.md microcopy matches FR-A04 but not FR-D05. Developers should copy-paste, not paraphrase.</div>
+        <div class="finding-fix"><strong>Fix:</strong> Add a "Required disclaimer strings" note to EXPERIENCE.md quoting both verbatim, labeled by FR reference.</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-medium">Medium</span><h3 class="finding-title">Financial language prohibition does not bind AI system prompt</h3><span class="finding-location">EXPERIENCE.md §Design Philosophy</span></header>
+        <div class="finding-note">The prohibition covers UI microcopy but neither spine references NFR-AI01 (AI system prompt must enforce these prohibitions and be version-controlled as application code).</div>
+        <div class="finding-fix"><strong>Fix:</strong> Add a line in Design Philosophy: "These prohibitions apply equally to AI-generated analysis text. The AI system prompt (see NFR-AI01) is the enforcement mechanism for the AI output layer."</div>
+      </article>
+      <article class="finding">
+        <header><span class="badge badge-sev-low">Low</span><h3 class="finding-title">Sentiment inversion prohibition is implicit, not explicit</h3><span class="finding-location">DESIGN.md §Do's and Don'ts</span></header>
+        <div class="finding-fix"><strong>Fix:</strong> Add: "Don't: Invert the green/red sentiment mapping under any circumstance, including in success states, loading indicators, or non-market UI contexts."</div>
+      </article>
+    </div>
+  </details>
+</section>
+
+<div class="mechanical">
+  <h3>Mechanical notes</h3>
+  <ul>
+    <li><strong>Nav label / route split:</strong> Nav reads "Stocks / หุ้น"; surface and component docs read "Trends". Unresolved before stories are written = divergent implementation. Pick one.</li>
+    <li><strong>Bottom tab bar 4th tab ambiguous:</strong> If "Stocks" maps to Trends (themes), the 4th tab may be About — but About has its own nav in the desktop navbar. Confirm the mobile tab bar structure.</li>
+    <li><strong>WCAG 2.1 vs. 2.2:</strong> Spines commit to WCAG 2.1 AA (matching the PRD). WCAG 2.2 is current (Oct 2023). Consider upgrading for a new product if launch is planned post-2024.</li>
+    <li><strong>UJ naming prefix divergence:</strong> PRD "UJ-1" vs. EXPERIENCE.md "Flow 1". Low risk (protagonist names align) but creates lookup friction for story-writers tracing coverage.</li>
+    <li><strong>Typography token gap:</strong> No {typography.*} path tokens in DESIGN.md frontmatter. Prose table is sufficient since EXPERIENCE.md makes no {typography.*} path references. No action required unless token refs are added.</li>
+  </ul>
+</div>
+
+<footer class="report-footer">
+  <div class="meta">
+    <span>Reviewers: review-rubric.md · review-accessibility.md · review-compliance.md</span>
+    <span>Generated: 2026-06-20T00:00:00+07:00</span>
+  </div>
+</footer>
+
+</div>
+</body>
+</html>

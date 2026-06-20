@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AlphaBrief — News Card Hierarchy Options</title>
+<style>
+  /* ─── Tokens ─────────────────────────────────────────────── */
+  :root {
+    --espresso: #4A342A;
+    --cocoa:    #7D5A44;
+    --camel:    #B2967D;
+    --khaki:    #D7C9B8;
+    --linen:    #F5F1EA;
+    --positive: #2d6a4f;
+    --positive-bg: #f0fdf4;
+    --positive-border: #bbf7d0;
+    --negative: #c1121f;
+    --negative-bg: #fff0f0;
+    --negative-border: #fecaca;
+    --neutral-text: #78716c;
+    --neutral-bg: #f5f5f4;
+    --neutral-border: #e7e5e4;
+    --white: #ffffff;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--linen);
+    color: var(--espresso);
+    padding: 32px 24px;
+  }
+
+  h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--espresso);
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    font-size: 13px;
+    color: var(--camel);
+    margin-bottom: 32px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    max-width: 1100px;
+  }
+
+  @media (max-width: 800px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  /* ─── Option label ────────────────────────────────────────── */
+  .option-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--camel);
+    margin-bottom: 8px;
+  }
+  .option-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--espresso);
+    margin-bottom: 4px;
+  }
+  .option-desc {
+    font-size: 12px;
+    color: var(--neutral-text);
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+
+  /* ─── Card shell ──────────────────────────────────────────── */
+  .card {
+    background: var(--white);
+    border-radius: 12px;
+    border: 1px solid rgba(74,52,42,0.1);
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .card:hover { box-shadow: 0 4px 16px rgba(74,52,42,0.1); }
+
+  /* ─── Option A — Current order ───────────────────────────── */
+  /* category + source + time → headline → summary → AI box → stocks */
+
+  .card-a .meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 16px 0;
+  }
+  .cat-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: #fff7ed;
+    color: #9a3412;
+  }
+  .cat-tag.energy { background: #fff7ed; color: #9a3412; }
+  .cat-tag.tech   { background: #faf5ff; color: #581c87; }
+  .cat-tag.set    { background: #f0fdf4; color: #14532d; }
+  .source-name {
+    font-size: 11px;
+    color: var(--camel);
+  }
+  .timestamp {
+    font-size: 11px;
+    color: var(--khaki);
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .card-body { padding: 12px 16px 16px; }
+
+  .headline {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--espresso);
+    margin-bottom: 8px;
+  }
+  .summary-text {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--neutral-text);
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .ai-box {
+    display: flex;
+    gap: 10px;
+    background: var(--linen);
+    border-left: 2px solid var(--camel);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+  }
+  .ai-icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    background: var(--camel);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+  .ai-icon svg { display: block; }
+  .ai-text {
+    font-size: 12px;
+    line-height: 1.55;
+    color: var(--cocoa);
+  }
+  .ai-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--camel);
+    margin-bottom: 3px;
+  }
+
+  .stock-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .stock-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: ui-monospace, monospace;
+    padding: 3px 8px;
+    border-radius: 5px;
+    border: 1px solid transparent;
+  }
+  .stock-badge.up   { background: var(--positive-bg); color: var(--positive); border-color: var(--positive-border); }
+  .stock-badge.down { background: var(--negative-bg); color: var(--negative); border-color: var(--negative-border); }
+  .stock-badge.flat { background: var(--neutral-bg); color: var(--neutral-text); border-color: var(--neutral-border); }
+
+  /* ─── Sentiment badge ─────────────────────────────────────── */
+  .sentiment-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 3px 9px;
+    border-radius: 20px;
+  }
+  .sentiment-badge.bullish { background: var(--positive-bg); color: var(--positive); }
+  .sentiment-badge.bearish { background: var(--negative-bg); color: var(--negative); }
+  .sentiment-badge.neutral { background: var(--neutral-bg); color: var(--neutral-text); }
+  .sentiment-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .sentiment-dot.bullish { background: var(--positive); }
+  .sentiment-dot.bearish { background: var(--negative); }
+  .sentiment-dot.neutral { background: var(--neutral-text); }
+
+  /* ─── Option B — New hierarchy ────────────────────────────── */
+  /* sentiment badge (top-right) + headline → AI box → sectors/stocks → source + time → category */
+
+  .card-b .card-header {
+    padding: 14px 16px 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .card-b .headline {
+    margin-bottom: 0;
+    flex: 1;
+  }
+  .card-b .ai-box {
+    margin-bottom: 10px;
+  }
+
+  .divider {
+    height: 1px;
+    background: rgba(74,52,42,0.07);
+    margin: 10px 0;
+  }
+
+  .card-b .footer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .footer-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .source-dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--khaki);
+  }
+
+  /* ─── Featured accent ─────────────────────────────────────── */
+  .card.featured {
+    border-left: 3px solid var(--camel);
+  }
+
+  /* ─── Annotation callouts ─────────────────────────────────── */
+  .annotation {
+    font-size: 11px;
+    color: var(--camel);
+    background: rgba(178,150,125,0.08);
+    border: 1px dashed rgba(178,150,125,0.3);
+    border-radius: 5px;
+    padding: 4px 8px;
+    margin-top: 8px;
+    line-height: 1.4;
+  }
+
+  /* ─── Note section ────────────────────────────────────────── */
+  .notes-box {
+    grid-column: 1 / -1;
+    background: var(--white);
+    border: 1px solid rgba(74,52,42,0.1);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-top: 8px;
+  }
+  .notes-box h3 { font-size: 13px; font-weight: 700; color: var(--espresso); margin-bottom: 10px; }
+  .notes-box ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .notes-box li { font-size: 12px; color: var(--neutral-text); line-height: 1.5; padding-left: 14px; position: relative; }
+  .notes-box li::before { content: "→"; position: absolute; left: 0; color: var(--camel); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<h1>News Card — Hierarchy Options</h1>
+<p class="subtitle">Same content, two scan orders. Pick the one that matches how Nam reads at 7am.</p>
+
+<div class="grid">
+
+  <!-- ── OPTION A: Current order ───────────────────────────── -->
+  <div>
+    <div class="option-label">Option A — Current</div>
+    <div class="option-title">Category First</div>
+    <div class="option-desc">Category tag + source + time appear above the headline. Useful when users scan by category before reading. Headlines feel smaller relative to the metadata row.</div>
+
+    <div class="card featured">
+      <!-- Meta row: category, source, time -->
+      <div class="meta-row">
+        <span class="cat-tag energy">ENERGY</span>
+        <span class="source-name">Reuters</span>
+        <span class="timestamp">2 hrs ago</span>
+      </div>
+
+      <div class="card-body">
+        <!-- Headline (second visual element) -->
+        <h2 class="headline">OPEC+ Extends Production Cuts Through Q3, Oil Prices Rise on Supply Tightening Signal</h2>
+
+        <!-- Summary (third) -->
+        <p class="summary-text">The alliance agreed to maintain voluntary cuts of 2.2 million barrels per day, pushing Brent crude above $87. Markets reacted positively on expectation of continued supply discipline.</p>
+
+        <!-- AI box (fourth) -->
+        <div class="ai-box">
+          <div class="ai-icon">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
+              <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
+            </svg>
+          </div>
+          <div>
+            <div class="ai-label">AI IMPACT</div>
+            <div class="ai-text">OPEC's extended cuts signal continued supply restriction. Short-term upward pressure on oil prices is negative for energy-importing economies. Sectors most affected: Energy (bearish cost pressure for consumers), Consumer Goods (rising input costs).</div>
+          </div>
+        </div>
+
+        <!-- Stock impacts (fifth) -->
+        <div class="stock-row">
+          <span class="stock-badge up">▲ PTT</span>
+          <span class="stock-badge up">▲ PTTEP</span>
+          <span class="stock-badge down">▼ AAV</span>
+          <span class="stock-badge flat">– DELTA</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation">
+      Scan path: Category → Source → Headline → AI insight → Stocks<br>
+      Issue: Source metadata competes with the headline for first attention.
+    </div>
+  </div>
+
+  <!-- ── OPTION B: New hierarchy ────────────────────────────── -->
+  <div>
+    <div class="option-label">Option B — Proposed</div>
+    <div class="option-title">Headline + Sentiment First</div>
+    <div class="option-desc">Headline and sentiment badge lead. AI insight follows immediately — the "so what" is front and center. Source, time, and category are footer metadata. Designed for Nam's 8-minute morning scan.</div>
+
+    <div class="card featured card-b">
+      <!-- Header: Headline + Sentiment badge -->
+      <div class="card-header">
+        <h2 class="headline">OPEC+ Extends Production Cuts Through Q3, Oil Prices Rise on Supply Tightening Signal</h2>
+        <span class="sentiment-badge bearish" style="flex-shrink:0; margin-top:2px;">
+          <span class="sentiment-dot bearish"></span>
+          BEARISH
+        </span>
+      </div>
+
+      <div class="card-body" style="padding-top:0;">
+        <!-- AI box (immediately after headline) -->
+        <div class="ai-box">
+          <div class="ai-icon">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
+              <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
+            </svg>
+          </div>
+          <div>
+            <div class="ai-label">AI IMPACT</div>
+            <div class="ai-text">OPEC's extended cuts signal continued supply restriction. Short-term upward pressure on oil prices is negative for energy-importing economies. Sectors most affected: Energy (bearish cost pressure for consumers), Consumer Goods (rising input costs).</div>
+          </div>
+        </div>
+
+        <!-- Sectors + Stock impacts -->
+        <div class="stock-row" style="margin-bottom:12px;">
+          <span class="stock-badge up">▲ PTT</span>
+          <span class="stock-badge up">▲ PTTEP</span>
+          <span class="stock-badge down">▼ AAV</span>
+          <span class="stock-badge flat">– DELTA</span>
+        </div>
+
+        <!-- Divider before footer metadata -->
+        <div class="divider"></div>
+
+        <!-- Footer: Source + time + category -->
+        <div class="footer-row">
+          <div class="footer-left">
+            <span class="source-name" style="font-size:12px;">Reuters</span>
+            <span class="source-dot"></span>
+            <span class="timestamp" style="font-size:12px; color:var(--khaki);">2 hrs ago</span>
+          </div>
+          <span class="cat-tag energy">ENERGY</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation">
+      Scan path: Headline → Sentiment → AI insight → Stock impacts → Source/Time<br>
+      Category becomes a confirmation tag, not a gatekeeper.
+    </div>
+  </div>
+
+  <!-- ── Notes ─────────────────────────────────────────────── -->
+  <div class="notes-box">
+    <h3>Design notes for Option B</h3>
+    <ul>
+      <li><strong>Sentiment badge</strong> (top-right of headline): uses dot + label — meets WCAG 2.1 AA non-color requirement. Color alone is insufficient for bearish/bullish distinction.</li>
+      <li><strong>AI box</strong> moves from "optional detail" to "primary value prop" — positioned immediately after headline, before stock tickers.</li>
+      <li><strong>Stock impacts</strong> stay above the fold but below the AI insight — they answer "which stocks?" after the "what happened?" and "so what?" are established.</li>
+      <li><strong>Source + time + category</strong> demoted to footer row — these are credibility signals, not discovery signals. Users arrived at this card from a feed already filtered by category.</li>
+      <li><strong>Featured cards</strong> (left camel border) are unchanged — that accent remains a visual hook for editors to promote items.</li>
+      <li><strong>No inline summary text</strong> in Option B — the AI insight replaces the raw summary as the secondary text. This saves vertical space and eliminates the "why read both?" confusion.</li>
+      <li><strong>Detail page</strong>: clicking navigates to a permalink. Summary, full AI analysis, all sector impacts, original source link, AI disclaimer, and analysis timestamp all live on the detail page only.</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AlphaBrief — Home Page Mock (Option C)</title>
+<style>
+/* ═══════════════════════════════════════════════════════════
+   AlphaBrief Design Tokens — Option C "Rich Blend"
+   ═══════════════════════════════════════════════════════════ */
+:root {
+  --espresso:       #4A342A;
+  --cocoa:          #7D5A44;
+  --camel:          #B2967D;
+  --khaki:          #D7C9B8;
+  --linen:          #F5F1EA;
+  --linen-deep:     #EDE8E0;   /* page background */
+  --white:          #FFFFFF;
+  --positive:       #2d6a4f;
+  --positive-bg:    #f0fdf4;
+  --positive-border:#bbf7d0;
+  --negative:       #c1121f;
+  --negative-bg:    #fff0f0;
+  --negative-border:#fecaca;
+  --neutral-text:   #78716c;
+  --neutral-bg:     #f5f5f4;
+  --neutral-border: #e7e5e4;
+  --card-border:    #D7C9B8;   /* khaki card borders */
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--linen-deep);
+  color: var(--espresso);
+  min-height: 100vh;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   NAVBAR
+   ═══════════════════════════════════════════════════════════ */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--espresso);
+  border-bottom: 1px solid rgba(215,201,184,0.15);
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.logo-icon {
+  width: 32px; height: 32px;
+  border-radius: 4px;
+  background: var(--khaki);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.logo-icon svg { display: block; }
+.logo-text { line-height: 1; }
+.logo-name {
+  font-size: 15px; font-weight: 700;
+  letter-spacing: -0.01em; color: #fff;
+  display: block;
+}
+.logo-sub {
+  font-size: 10px; color: rgba(215,201,184,0.5);
+  display: block; margin-top: 2px;
+}
+
+.navbar-tabs {
+  display: flex; list-style: none;
+  height: 56px;
+}
+.navbar-tabs li a {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 0 20px; height: 56px;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.navbar-tabs li a.active {
+  border-bottom-color: var(--khaki);
+  color: var(--khaki);
+}
+.navbar-tabs li a:not(.active) { color: rgba(255,255,255,0.45); }
+.tab-label { font-size: 13px; font-weight: 600; letter-spacing: 0.01em; }
+.tab-sub   { font-size: 10px; margin-top: 2px; opacity: 0.7; }
+
+.navbar-right { display: flex; align-items: center; gap: 14px; }
+.nav-clock { text-align: right; }
+.clock-time {
+  font-size: 12px; font-weight: 600;
+  font-family: ui-monospace, monospace;
+  color: #fff; display: block; line-height: 1;
+}
+.clock-tz {
+  font-size: 9px; color: rgba(215,201,184,0.45);
+  display: block; margin-top: 2px;
+}
+.live-badge {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 3px 9px; border-radius: 4px;
+  background: rgba(215,201,184,0.12);
+  color: var(--khaki);
+  border: 1px solid rgba(215,201,184,0.2);
+}
+.live-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #4ade80;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* ═══════════════════════════════════════════════════════════
+   TICKER BAR
+   ═══════════════════════════════════════════════════════════ */
+.ticker-bar {
+  background: var(--espresso);
+  border-bottom: 1px solid rgba(215,201,184,0.1);
+  height: 36px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+.ticker-track {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  animation: ticker 30s linear infinite;
+  gap: 0;
+}
+.ticker-track:hover { animation-play-state: paused; }
+@keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+.ticker-item {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 0 20px;
+  font-size: 11px; font-family: ui-monospace, monospace;
+  border-right: 1px solid rgba(215,201,184,0.12);
+}
+.ticker-symbol { color: var(--khaki); font-weight: 700; }
+.ticker-val    { font-weight: 600; }
+.ticker-val.up   { color: #4ade80; }
+.ticker-val.down { color: #f87171; }
+.ticker-sep { color: rgba(215,201,184,0.2); padding: 0 2px; }
+
+/* ═══════════════════════════════════════════════════════════
+   PAGE HEADER BAR
+   ═══════════════════════════════════════════════════════════ */
+.page-header {
+  background: var(--linen);
+  border-bottom: 1px solid rgba(74,52,42,0.1);
+  padding: 0 24px;
+  height: 48px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.page-title {
+  font-size: 14px; font-weight: 700; color: var(--espresso);
+}
+.page-title span { font-weight: 400; color: var(--camel); margin-left: 6px; font-size: 13px; }
+
+.page-stats { display: flex; align-items: center; gap: 20px; }
+.stat { text-align: right; }
+.stat-val  { font-size: 12px; font-weight: 700; font-family: ui-monospace, monospace; color: var(--espresso); }
+.stat-label{ font-size: 9px; letter-spacing: 0.1em; color: var(--camel); }
+
+/* ═══════════════════════════════════════════════════════════
+   MAIN LAYOUT
+   ═══════════════════════════════════════════════════════════ */
+.page-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 20px 16px;
+}
+
+.search-row {
+  background: var(--white);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 16px;
+  height: 40px;
+  margin-bottom: 20px;
+}
+.search-row svg { flex-shrink: 0; }
+.search-input {
+  flex: 1; border: none; outline: none;
+  font-size: 13px; color: var(--espresso);
+  background: transparent;
+}
+.search-hint {
+  font-size: 10px; font-family: ui-monospace, monospace;
+  color: var(--khaki); letter-spacing: 0.05em;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 20px;
+  align-items: start;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION HEADER
+   ═══════════════════════════════════════════════════════════ */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.section-title-row { display: flex; align-items: center; gap: 8px; }
+.section-accent { width: 4px; height: 20px; border-radius: 2px; background: var(--camel); }
+.section-title { font-size: 13px; font-weight: 700; color: var(--espresso); }
+.section-sub   { font-size: 13px; color: var(--camel); }
+.view-all {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--camel);
+  text-decoration: none;
+}
+.view-all:hover { text-decoration: underline; }
+
+/* ═══════════════════════════════════════════════════════════
+   NEWS FEED + CARDS
+   ═══════════════════════════════════════════════════════════ */
+.news-feed { display: flex; flex-direction: column; gap: 10px; }
+
+.news-card {
+  background: var(--white);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+.news-card:hover { box-shadow: 0 4px 16px rgba(74,52,42,0.10); }
+.news-card.featured { border-left: 3px solid var(--camel); }
+
+.card-body { padding: 14px 16px; }
+
+/* Row 1: headline + sentiment badge */
+.card-head-row {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 10px;
+  margin-bottom: 10px;
+}
+.card-headline {
+  font-size: 15px; font-weight: 700;
+  line-height: 1.35; color: var(--espresso);
+  flex: 1;
+}
+
+/* Sentiment badge */
+.sentiment-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.07em;
+  padding: 3px 9px; border-radius: 20px;
+  flex-shrink: 0; margin-top: 2px;
+  white-space: nowrap;
+}
+.sentiment-badge.bearish { background: var(--negative-bg); color: var(--negative); }
+.sentiment-badge.bullish { background: var(--positive-bg); color: var(--positive); }
+.sentiment-badge.neutral { background: var(--neutral-bg);  color: var(--neutral-text); }
+.badge-dot {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+}
+.badge-dot.bearish { background: var(--negative); }
+.badge-dot.bullish { background: var(--positive); }
+.badge-dot.neutral { background: var(--neutral-text); }
+
+/* Row 2: AI insight box */
+.ai-box {
+  background: var(--linen);
+  border-left: 2px solid var(--camel);
+  border-radius: 6px;
+  padding: 9px 11px;
+  margin-bottom: 10px;
+  font-size: 13px; line-height: 1.55;
+  color: var(--cocoa);
+}
+
+/* Row 3: stock badges */
+.stock-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.stock-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 10px; font-weight: 700;
+  font-family: ui-monospace, monospace;
+  padding: 3px 8px; border-radius: 20px; border: 1px solid;
+}
+.stock-badge.up   { background: var(--positive-bg); color: var(--positive); border-color: var(--positive-border); }
+.stock-badge.down { background: var(--negative-bg); color: var(--negative); border-color: var(--negative-border); }
+.stock-badge.flat { background: var(--neutral-bg);  color: var(--neutral-text); border-color: var(--neutral-border); }
+
+/* Divider */
+.card-divider { height: 1px; background: var(--card-border); margin: 0 16px; }
+
+/* Row 4: footer */
+.card-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 16px 12px;
+}
+.card-footer-left { display: flex; align-items: center; gap: 6px; }
+.source-name { font-size: 11px; color: var(--camel); }
+.footer-sep  { width: 3px; height: 3px; border-radius: 50%; background: var(--khaki); }
+.pub-time    { font-size: 11px; color: var(--neutral-text); font-variant-numeric: tabular-nums; }
+.cat-tag {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.09em;
+  padding: 2px 6px; border-radius: 4px;
+}
+.cat-tag.energy  { background: #fff7ed; color: #9a3412; }
+.cat-tag.tech    { background: #faf5ff; color: #581c87; }
+.cat-tag.global  { background: #eff6ff; color: #1e3a8a; }
+.cat-tag.set     { background: #f0fdf4; color: #14532d; }
+.cat-tag.macro   { background: #fefce8; color: #713f12; }
+
+/* Analysis pending state */
+.ai-box.pending { opacity: 0.55; }
+.ai-box.pending .pending-text {
+  color: var(--camel); font-style: italic;
+  display: flex; align-items: center; gap: 6px;
+}
+.pending-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--camel);
+  animation: pulse 1.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SIDEBAR
+   ═══════════════════════════════════════════════════════════ */
+.sidebar { display: flex; flex-direction: column; gap: 14px; }
+
+/* Daily Brief card */
+.brief-card {
+  border: 1px solid var(--card-border);
+  border-radius: 12px; overflow: hidden;
+}
+.brief-header {
+  background: var(--espresso);
+  padding: 11px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.brief-header-left { display: flex; align-items: center; gap: 9px; }
+.brief-icon {
+  width: 28px; height: 28px; border-radius: 4px;
+  background: rgba(215,201,184,0.2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.brief-title-block { line-height: 1; }
+.brief-title  { font-size: 13px; font-weight: 700; color: #fff; display: block; }
+.brief-date   { font-size: 10px; color: rgba(215,201,184,0.5); display: block; margin-top: 2px; }
+
+.brief-body { background: var(--white); padding: 14px 14px; }
+.brief-overview {
+  font-size: 13px; line-height: 1.6; color: var(--cocoa);
+  margin-bottom: 12px;
+}
+.brief-points { display: flex; flex-direction: column; gap: 7px; }
+.brief-point  { display: flex; gap: 8px; align-items: flex-start; }
+.point-num {
+  flex-shrink: 0; width: 16px; height: 16px;
+  background: var(--linen); color: var(--camel);
+  border-radius: 3px; font-size: 9px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1px;
+}
+.point-text { font-size: 12px; line-height: 1.5; color: var(--neutral-text); }
+.point-text strong { color: var(--espresso); font-weight: 600; }
+
+.brief-footer {
+  padding: 10px 14px 12px;
+  border-top: 1px solid rgba(74,52,42,0.07);
+  background: var(--white);
+}
+.brief-disclaimer {
+  font-size: 10px; color: var(--neutral-text); line-height: 1.5;
+  font-style: italic;
+}
+
+/* Market Overview widget */
+.widget {
+  background: var(--white);
+  border: 1px solid var(--card-border);
+  border-radius: 10px; overflow: hidden;
+}
+.widget-header {
+  padding: 10px 12px;
+  background: var(--linen);
+  border-bottom: 1px solid rgba(74,52,42,0.08);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.widget-title { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: var(--cocoa); text-transform: uppercase; }
+.widget-sub   { font-size: 10px; color: var(--camel); }
+.widget-body  { padding: 4px 0; }
+
+.index-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 7px 12px;
+  border-bottom: 1px solid rgba(74,52,42,0.05);
+}
+.index-row:last-child { border-bottom: none; }
+.index-name  { font-size: 12px; font-weight: 600; color: var(--espresso); }
+.index-vals  { text-align: right; }
+.index-price { font-size: 12px; font-weight: 700; font-family: ui-monospace, monospace; color: var(--espresso); }
+.index-chg   { font-size: 10px; font-family: ui-monospace, monospace; }
+.index-chg.up   { color: var(--positive); }
+.index-chg.down { color: var(--negative); }
+
+/* Sector Heatmap */
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  padding: 10px;
+}
+.sector-cell {
+  border-radius: 6px; padding: 8px 10px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.sector-name { font-size: 10px; font-weight: 700; letter-spacing: 0.05em; }
+.sector-chg  { font-size: 11px; font-weight: 700; font-family: ui-monospace, monospace; }
+
+.sector-cell.up-strong { background: #dcfce7; }
+.sector-cell.up-strong .sector-name { color: #166534; }
+.sector-cell.up-strong .sector-chg  { color: #16a34a; }
+
+.sector-cell.up-mild { background: #ecfdf5; }
+.sector-cell.up-mild .sector-name { color: #14532d; }
+.sector-cell.up-mild .sector-chg  { color: #22c55e; }
+
+.sector-cell.flat { background: var(--linen); }
+.sector-cell.flat .sector-name { color: var(--cocoa); }
+.sector-cell.flat .sector-chg  { color: var(--neutral-text); }
+
+.sector-cell.down-mild { background: #fff1f2; }
+.sector-cell.down-mild .sector-name { color: #9f1239; }
+.sector-cell.down-mild .sector-chg  { color: #e11d48; }
+
+.sector-cell.down-strong { background: #ffe4e6; }
+.sector-cell.down-strong .sector-name { color: #881337; }
+.sector-cell.down-strong .sector-chg  { color: var(--negative); }
+
+/* Trend Summary widget */
+.trend-list  { padding: 2px 0; }
+.trend-item  {
+  padding: 9px 12px;
+  border-bottom: 1px solid rgba(74,52,42,0.06);
+  display: flex; gap: 10px;
+}
+.trend-item:last-child { border-bottom: none; }
+.trend-rank {
+  flex-shrink: 0; width: 18px; height: 18px;
+  background: var(--linen); color: var(--camel);
+  border-radius: 3px; font-size: 9px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1px;
+}
+.trend-content { min-width: 0; }
+.trend-name { font-size: 12px; font-weight: 600; color: var(--espresso); margin-bottom: 3px; line-height: 1.3; }
+.trend-desc { font-size: 11px; color: var(--neutral-text); line-height: 1.45; margin-bottom: 5px; }
+.trend-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.06em;
+  padding: 2px 7px; border-radius: 20px;
+}
+.trend-badge.bullish { background: var(--positive-bg); color: var(--positive); }
+.trend-badge.bearish { background: var(--negative-bg); color: var(--negative); }
+.trend-badge.neutral { background: var(--neutral-bg);  color: var(--neutral-text); }
+
+/* ═══════════════════════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════════════════════ */
+.site-footer {
+  background: var(--espresso);
+  border-top: 1px solid rgba(215,201,184,0.1);
+  padding: 16px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 32px;
+}
+.footer-brand { display: flex; align-items: center; gap: 8px; }
+.footer-name  { font-size: 13px; font-weight: 700; color: var(--khaki); }
+.footer-sep-dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(215,201,184,0.25); }
+.footer-sub   { font-size: 11px; color: rgba(215,201,184,0.35); }
+.footer-disc  { font-size: 11px; color: rgba(215,201,184,0.35); }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════ NAVBAR ════════════════════ -->
+<header class="navbar">
+  <a href="#" class="navbar-logo">
+    <div class="logo-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+        stroke="#4A342A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+        <polyline points="16 7 22 7 22 13"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <span class="logo-name">AlphaBrief</span>
+      <span class="logo-sub">AI Financial Research</span>
+    </div>
+  </a>
+
+  <ul class="navbar-tabs">
+    <li><a href="#" class="active">
+      <span class="tab-label">Overview</span>
+      <span class="tab-sub">ภาพรวม</span>
+    </a></li>
+    <li><a href="#">
+      <span class="tab-label">News</span>
+      <span class="tab-sub">ข่าว</span>
+    </a></li>
+    <li><a href="#">
+      <span class="tab-label">Stocks</span>
+      <span class="tab-sub">หุ้น</span>
+    </a></li>
+    <li><a href="#">
+      <span class="tab-label">Trends</span>
+      <span class="tab-sub">แนวโน้ม</span>
+    </a></li>
+  </ul>
+
+  <div class="navbar-right">
+    <div class="nav-clock">
+      <span class="clock-time">09:14:37</span>
+      <span class="clock-tz">Bangkok, ICT</span>
+    </div>
+    <div class="live-badge">
+      <span class="live-dot"></span>
+      LIVE
+    </div>
+  </div>
+</header>
+
+<!-- ════════════════════ TICKER BAR ════════════════════ -->
+<div class="ticker-bar">
+  <div class="ticker-track">
+    <!-- doubled for seamless loop -->
+    <span class="ticker-item"><span class="ticker-symbol">SET</span><span class="ticker-val up">▲ +0.82%</span></span>
+    <span class="ticker-item"><span class="ticker-symbol">PTT</span><span class="ticker-val up">▲ +1.34%</span></span>
+    <span class="ticker-item"><span class="ticker-symbol">KBANK</span><span class="ticker-val down">▼ -0.56%</span></span>
+    <span class="ticker-item"><span class="ticker-symbol">DELTA</span><span class="ticker-val up">▲ +2.18%</span></span>
+    <span class="ticker-item"><span class="ticker-symbol">AOT</span><span class="ticker-val down">▼ -0.34%</span></span>
+    <span class="ticker-item"><span class="ticker-symbol">S&P 500</span><span class="ticker-val down">▼ -0.21%</span></span>
+    <span class="ticker-item"><span class="ticker-symbol">NASDAQ</span><span class="ticker-val down">▼ -0.47%</span></span>
+    <span class="ticker-item"><span class="ticker-symbol">OIL (WTI)</span><span class="ticker-val up">▲ +1.92%</span></span>
+    <span class="ticker-item"><span class="ticker-symbol">PTTEP</span><span class="ticker-val up">▲ +1.10%</span></span>
+    <span class="ticker-item"><span class="ticker-symbol">HANA</span><span class="ticker-val up">▲ +0.75%</span></span>
+    <span class="ticker-item"><span class="ticker-symbol">AAV</span><span class="ticker-val down">▼ -1.23%</span></span>
+    <span class="ticker-item"><span class="ticker-symbol">GOLD</span><span class="ticker-val up">▲ +0.38%</span></span>
+    <!-- duplicate for seamless -->
+    <span class="ticker-item"><span class="ticker-symbol">SET</span><span class="ticker-val up">▲ +0.82%</span></span>
+    <span class="ticker-item"><span class="ticker-symbol">PTT</span><span class="ticker-val up">▲ +1.34%</span></span>
+    <span class="ticker-item"><span class="ticker-symbol">KBANK</span><span class="ticker-val down">▼ -0.56%</span></span>
+    <span class="ticker-item"><span class="ticker-symbol">DELTA</span><span class="ticker-val up">▲ +2.18%</span></span>
+    <span class="ticker-item"><span class="ticker-symbol">AOT</span><span class="ticker-val down">▼ -0.34%</span></span>
+    <span class="ticker-item"><span class="ticker-symbol">S&P 500</span><span class="ticker-val down">▼ -0.21%</span></span>
+    <span class="ticker-item"><span class="ticker-symbol">NASDAQ</span><span class="ticker-val down">▼ -0.47%</span></span>
+    <span class="ticker-item"><span class="ticker-symbol">OIL (WTI)</span><span class="ticker-val up">▲ +1.92%</span></span>
+    <span class="ticker-item"><span class="ticker-symbol">PTTEP</span><span class="ticker-val up">▲ +1.10%</span></span>
+    <span class="ticker-item"><span class="ticker-symbol">HANA</span><span class="ticker-val up">▲ +0.75%</span></span>
+    <span class="ticker-item"><span class="ticker-symbol">AAV</span><span class="ticker-val down">▼ -1.23%</span></span>
+    <span class="ticker-item"><span class="ticker-symbol">GOLD</span><span class="ticker-val up">▲ +0.38%</span></span>
+  </div>
+</div>
+
+<!-- ════════════════════ PAGE HEADER BAR ════════════════════ -->
+<div class="page-header">
+  <div class="page-title">
+    Market Overview <span>ภาพรวมตลาด</span>
+  </div>
+  <div class="page-stats">
+    <div class="stat">
+      <div class="stat-val">47</div>
+      <div class="stat-label">NEWS TODAY</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">312</div>
+      <div class="stat-label">STOCKS COVERED</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">09:12 ICT</div>
+      <div class="stat-label">LAST UPDATE</div>
+    </div>
+    <div class="live-badge" style="font-size:10px;">
+      <span class="live-dot"></span>LIVE
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ MAIN CONTENT ════════════════════ -->
+<div class="page-container">
+
+  <!-- Search -->
+  <div class="search-row">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+      stroke="#D7C9B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <div class="search-input" style="color:#B2967D;font-size:13px;">
+      Search news, stocks, sectors... / ค้นหาข่าว หุ้น กลุ่มอุตสาหกรรม
+    </div>
+    <span class="search-hint">PTT · KBANK · FED · OIL</span>
+  </div>
+
+  <!-- Two-column grid -->
+  <div class="content-grid">
+
+    <!-- ── LEFT: News Feed ─────────────────────────────── -->
+    <div>
+      <div class="section-header">
+        <div class="section-title-row">
+          <div class="section-accent"></div>
+          <span class="section-title">Financial News</span>
+          <span class="section-sub">· ข่าวการเงิน</span>
+        </div>
+        <a href="#" class="view-all">View All →</a>
+      </div>
+
+      <div class="news-feed">
+
+        <!-- Card 1: BEARISH, featured -->
+        <article class="news-card featured">
+          <div class="card-body">
+            <div class="card-head-row">
+              <h2 class="card-headline">OPEC+ Extends Production Cuts Through Q3, Oil Prices Climb on Supply Tightening Signal</h2>
+              <span class="sentiment-badge bearish">
+                <span class="badge-dot bearish"></span>BEARISH
+              </span>
+            </div>
+            <div class="ai-box">
+              OPEC's extended cuts signal continued supply restriction into Q3. Upward pressure on oil prices is negative for energy-importing economies, including Thailand. Consumer Goods and Transport sectors face rising input costs. Energy producers — particularly PTT and PTTEP — benefit directly.
+            </div>
+            <div class="stock-row">
+              <span class="stock-badge up">▲ PTT</span>
+              <span class="stock-badge up">▲ PTTEP</span>
+              <span class="stock-badge down">▼ AAV</span>
+              <span class="stock-badge down">▼ THAI</span>
+              <span class="stock-badge flat">– CPALL</span>
+            </div>
+          </div>
+          <div class="card-divider"></div>
+          <div class="card-footer">
+            <div class="card-footer-left">
+              <span class="source-name">Reuters</span>
+              <span class="footer-sep"></span>
+              <span class="pub-time">2 hrs ago</span>
+            </div>
+            <span class="cat-tag energy">ENERGY</span>
+          </div>
+        </article>
+
+        <!-- Card 2: BULLISH -->
+        <article class="news-card">
+          <div class="card-body">
+            <div class="card-head-row">
+              <h2 class="card-headline">Thailand's EV Push Accelerates: DELTA Electronics Wins Major Battery Contract with BYD Supply Chain</h2>
+              <span class="sentiment-badge bullish">
+                <span class="badge-dot bullish"></span>BULLISH
+              </span>
+            </div>
+            <div class="ai-box">
+              The contract signals Thailand's growing role in the regional EV supply chain. DELTA is positioned as a key component supplier, reducing revenue concentration risk. Positive for Thai technology manufacturing broadly — HANA and similar component makers may see follow-on demand.
+            </div>
+            <div class="stock-row">
+              <span class="stock-badge up">▲ DELTA</span>
+              <span class="stock-badge up">▲ HANA</span>
+              <span class="stock-badge flat">– KCE</span>
+            </div>
+          </div>
+          <div class="card-divider"></div>
+          <div class="card-footer">
+            <div class="card-footer-left">
+              <span class="source-name">Bangkok Post</span>
+              <span class="footer-sep"></span>
+              <span class="pub-time">4 hrs ago</span>
+            </div>
+            <span class="cat-tag set">SET</span>
+          </div>
+        </article>
+
+        <!-- Card 3: NEUTRAL, analysis pending -->
+        <article class="news-card">
+          <div class="card-body">
+            <div class="card-head-row">
+              <h2 class="card-headline">Fed Minutes Signal Divided Committee on Rate Path; Markets Reprice 2024 Cut Expectations</h2>
+              <span class="sentiment-badge neutral">
+                <span class="badge-dot neutral"></span>NEUTRAL
+              </span>
+            </div>
+            <div class="ai-box">
+              Fed committee division reflects genuine uncertainty about the inflation trajectory. Markets have pushed back the expected first cut from September to December. Thai baht faces mild headwinds as USD strengthens on higher-for-longer expectations; SET may see foreign outflow pressure short-term.
+            </div>
+            <div class="stock-row">
+              <span class="stock-badge down">▼ KBANK</span>
+              <span class="stock-badge down">▼ BBL</span>
+              <span class="stock-badge flat">– SCB</span>
+            </div>
+          </div>
+          <div class="card-divider"></div>
+          <div class="card-footer">
+            <div class="card-footer-left">
+              <span class="source-name">Financial Times</span>
+              <span class="footer-sep"></span>
+              <span class="pub-time">6 hrs ago</span>
+            </div>
+            <span class="cat-tag macro">MACRO</span>
+          </div>
+        </article>
+
+        <!-- Card 4: BEARISH, analysis pending state -->
+        <article class="news-card">
+          <div class="card-body">
+            <div class="card-head-row">
+              <h2 class="card-headline">Taiwan Semiconductor Reports Softer Q2 Demand Outlook; AI Server Orders Remain Strong</h2>
+              <!-- No sentiment badge when pending -->
+            </div>
+            <div class="ai-box pending">
+              <div class="pending-text">
+                <span class="pending-dot"></span>
+                Analysis in progress
+              </div>
+            </div>
+          </div>
+          <div class="card-divider"></div>
+          <div class="card-footer">
+            <div class="card-footer-left">
+              <span class="source-name">Nikkei Asia</span>
+              <span class="footer-sep"></span>
+              <span class="pub-time">18 min ago</span>
+            </div>
+            <span class="cat-tag tech">TECH</span>
+          </div>
+        </article>
+
+      </div><!-- /news-feed -->
+    </div><!-- /left col -->
+
+    <!-- ── RIGHT: Sidebar ──────────────────────────────── -->
+    <div class="sidebar">
+
+      <!-- AI Daily Brief -->
+      <div class="brief-card">
+        <div class="brief-header">
+          <div class="brief-header-left">
+            <div class="brief-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="#D7C9B8" stroke-width="2.5">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4M12 8h.01"/>
+              </svg>
+            </div>
+            <div class="brief-title-block">
+              <span class="brief-title">AI Daily Brief · ภาพรวมตลาด</span>
+              <span class="brief-date">Friday, 20 June 2026</span>
+            </div>
+          </div>
+          <span class="sentiment-badge bearish" style="font-size:10px;">
+            <span class="badge-dot bearish"></span>BEARISH
+          </span>
+        </div>
+
+        <div class="brief-body">
+          <p class="brief-overview">
+            Global markets are under pressure from sustained Fed rate signals and OPEC supply discipline. The SET index is likely to open cautiously. Energy and Technology sectors are moving in opposite directions today.
+          </p>
+          <div class="brief-points">
+            <div class="brief-point">
+              <div class="point-num">1</div>
+              <div class="point-text"><strong>Fed minutes</strong> signal higher-for-longer — first cut now priced in December</div>
+            </div>
+            <div class="brief-point">
+              <div class="point-num">2</div>
+              <div class="point-text"><strong>OPEC+ extends cuts</strong> through Q3 — oil above $87, positive for PTT/PTTEP</div>
+            </div>
+            <div class="brief-point">
+              <div class="point-num">3</div>
+              <div class="point-text"><strong>DELTA EV contract win</strong> is a medium-term positive for Thai tech manufacturing</div>
+            </div>
+            <div class="brief-point">
+              <div class="point-num">4</div>
+              <div class="point-text">Thai baht faces mild pressure — watch for foreign equity outflows at SET open</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="brief-footer">
+          <p class="brief-disclaimer">AI-generated analysis is for informational purposes only and does not constitute investment advice.</p>
+        </div>
+      </div>
+
+      <!-- Market Overview Widget -->
+      <div class="widget">
+        <div class="widget-header">
+          <span class="widget-title">Market Overview</span>
+          <span class="widget-sub">ดัชนีตลาด</span>
+        </div>
+        <div class="widget-body">
+          <div class="index-row">
+            <span class="index-name">SET Index</span>
+            <div class="index-vals">
+              <div class="index-price">1,412.83</div>
+              <div class="index-chg up">▲ +11.62 (+0.82%)</div>
+            </div>
+          </div>
+          <div class="index-row">
+            <span class="index-name">S&P 500</span>
+            <div class="index-vals">
+              <div class="index-price">5,304.72</div>
+              <div class="index-chg down">▼ -11.09 (-0.21%)</div>
+            </div>
+          </div>
+          <div class="index-row">
+            <span class="index-name">Nasdaq</span>
+            <div class="index-vals">
+              <div class="index-price">16,920.41</div>
+              <div class="index-chg down">▼ -79.44 (-0.47%)</div>
+            </div>
+          </div>
+          <div class="index-row">
+            <span class="index-name">Brent Crude</span>
+            <div class="index-vals">
+              <div class="index-price">$87.24</div>
+              <div class="index-chg up">▲ +1.64 (+1.92%)</div>
+            </div>
+          </div>
+          <div class="index-row">
+            <span class="index-name">THB / USD</span>
+            <div class="index-vals">
+              <div class="index-price">36.82</div>
+              <div class="index-chg down">▼ -0.14 (-0.38%)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sector Heatmap -->
+      <div class="widget">
+        <div class="widget-header">
+          <span class="widget-title">Sector Heatmap</span>
+          <span class="widget-sub">กลุ่มอุตสาหกรรม</span>
+        </div>
+        <div class="heatmap-grid">
+          <div class="sector-cell up-strong">
+            <span class="sector-name">ENERGY</span>
+            <span class="sector-chg">▲ +1.87%</span>
+          </div>
+          <div class="sector-cell up-mild">
+            <span class="sector-name">TECH</span>
+            <span class="sector-chg">▲ +0.94%</span>
+          </div>
+          <div class="sector-cell flat">
+            <span class="sector-name">FINANCE</span>
+            <span class="sector-chg">– +0.11%</span>
+          </div>
+          <div class="sector-cell flat">
+            <span class="sector-name">CONSUMER</span>
+            <span class="sector-chg">– -0.08%</span>
+          </div>
+          <div class="sector-cell down-mild">
+            <span class="sector-name">TRANSPORT</span>
+            <span class="sector-chg">▼ -0.76%</span>
+          </div>
+          <div class="sector-cell down-strong">
+            <span class="sector-name">PROPERTY</span>
+            <span class="sector-chg">▼ -1.34%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trend Summary -->
+      <div class="widget">
+        <div class="widget-header">
+          <span class="widget-title">Weekly Themes</span>
+          <span class="widget-sub">แนวโน้มสัปดาห์</span>
+        </div>
+        <div class="trend-list">
+          <div class="trend-item">
+            <div class="trend-rank">1</div>
+            <div class="trend-content">
+              <div class="trend-name">AI Hardware Demand Cycle</div>
+              <div class="trend-desc">6 articles · Semiconductor and component demand driven by AI server buildout; DELTA and HANA positioned as beneficiaries.</div>
+              <span class="trend-badge bullish">▲ BULLISH</span>
+            </div>
+          </div>
+          <div class="trend-item">
+            <div class="trend-rank">2</div>
+            <div class="trend-content">
+              <div class="trend-name">OPEC Supply Discipline</div>
+              <div class="trend-desc">4 articles · Sustained production cuts keeping oil elevated; positive for producers, negative for importers and airlines.</div>
+              <span class="trend-badge bearish">▼ BEARISH</span>
+            </div>
+          </div>
+          <div class="trend-item">
+            <div class="trend-rank">3</div>
+            <div class="trend-content">
+              <div class="trend-name">Fed Rate Path Repricing</div>
+              <div class="trend-desc">5 articles · Market consensus shifts toward December cut; USD strength weighing on EM currencies including THB.</div>
+              <span class="trend-badge neutral">– NEUTRAL</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /sidebar -->
+  </div><!-- /content-grid -->
+</div><!-- /page-container -->
+
+<!-- ════════════════════ FOOTER ════════════════════ -->
+<footer class="site-footer">
+  <div class="footer-brand">
+    <span class="footer-name">AlphaBrief</span>
+    <span class="footer-sep-dot"></span>
+    <span class="footer-sub">AI Financial Research Assistant</span>
+  </div>
+  <span class="footer-disc">For educational purposes only. Not investment advice.</span>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AlphaBrief — Color Balance Options</title>
+<style>
+/*
+ * AlphaBrief Color Palette (shared across all variations)
+ * espresso:  #4A342A
+ * cocoa:     #7D5A44
+ * camel:     #B2967D
+ * khaki:     #D7C9B8
+ * linen:     #F5F1EA
+ * positive:  #2d6a4f
+ * negative:  #c1121f
+ * neutral:   #78716c
+ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #E8E3DC;
+  padding: 32px 20px 48px;
+  color: #4A342A;
+}
+
+h1 { font-size: 17px; font-weight: 700; color: #4A342A; margin-bottom: 4px; }
+.page-sub { font-size: 12px; color: #B2967D; margin-bottom: 28px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: 1200px;
+}
+@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+/* ─── Variation wrapper ───────────────────────────────────────── */
+.variation { display: flex; flex-direction: column; gap: 12px; }
+
+.var-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #B2967D;
+  margin-bottom: 2px;
+}
+.var-title { font-size: 15px; font-weight: 700; color: #4A342A; margin-bottom: 2px; }
+.var-desc  { font-size: 12px; color: #78716c; line-height: 1.5; margin-bottom: 8px; }
+
+/* ─── Color swatch strip ──────────────────────────────────────── */
+.swatches { display: flex; gap: 0; border-radius: 6px; overflow: hidden; height: 28px; }
+.swatch   { flex: 1; }
+.swatch-label { font-size: 9px; color: #B2967D; letter-spacing: 0.05em; margin-top: 4px; text-align: center; display: none; }
+
+/* ─── Mini UI preview ─────────────────────────────────────────── */
+.preview {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+}
+
+/* Nav */
+.mini-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  height: 40px;
+}
+.mini-logo { font-size: 12px; font-weight: 700; letter-spacing: -0.01em; }
+.mini-logo span { font-size: 9px; font-weight: 400; margin-left: 6px; opacity: 0.5; }
+.mini-tabs { display: flex; gap: 0; }
+.mini-tab {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 0 8px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid transparent;
+  letter-spacing: 0.02em;
+}
+.mini-tab.active { border-bottom-color: #D7C9B8; }
+.live-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: 0.06em;
+}
+.live-dot { width: 5px; height: 5px; border-radius: 50%; background: #4ade80; }
+
+/* Page area */
+.mini-page { padding: 12px 12px 14px; }
+
+/* Daily brief strip */
+.brief-card {
+  border-radius: 7px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+.brief-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.brief-title  { font-size: 11px; font-weight: 700; }
+.brief-badge  {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.06em;
+  padding: 2px 7px; border-radius: 20px;
+  display: flex; align-items: center; gap: 4px;
+}
+.brief-badge.bearish { background: rgba(193,18,31,0.1); color: #c1121f; }
+.brief-text { font-size: 10px; line-height: 1.5; }
+.brief-points { margin-top: 5px; display: flex; flex-direction: column; gap: 3px; }
+.brief-point {
+  display: flex; gap: 5px; font-size: 9.5px; line-height: 1.4;
+}
+.brief-point-num {
+  flex-shrink: 0; width: 13px; height: 13px; border-radius: 3px;
+  font-size: 8px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* News card */
+.mini-card {
+  border-radius: 7px;
+  border: 1px solid;
+  overflow: hidden;
+}
+.mini-card-body { padding: 8px 10px 10px; }
+.mini-headline { font-size: 11px; font-weight: 700; line-height: 1.35; margin-bottom: 6px; }
+.mini-ai-box {
+  border-left: 2px solid #B2967D;
+  border-radius: 4px;
+  padding: 6px 8px;
+  margin-bottom: 6px;
+  font-size: 9.5px;
+  line-height: 1.5;
+}
+.mini-ai-label { font-size: 8.5px; font-weight: 700; letter-spacing: 0.07em; margin-bottom: 2px; }
+.mini-stocks { display: flex; gap: 4px; flex-wrap: wrap; }
+.mini-stock {
+  font-size: 9px; font-weight: 700; font-family: monospace;
+  padding: 2px 5px; border-radius: 3px; border: 1px solid;
+}
+.mini-stock.up   { background: #f0fdf4; color: #2d6a4f; border-color: #bbf7d0; }
+.mini-stock.down { background: #fff0f0; color: #c1121f; border-color: #fecaca; }
+.mini-footer-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 6px; margin-top: 6px;
+  font-size: 9px;
+  border-top: 1px solid;
+}
+.mini-cat {
+  font-size: 8.5px; font-weight: 700; letter-spacing: 0.08em;
+  padding: 2px 5px; border-radius: 3px;
+}
+.mini-sentiment {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.06em;
+  padding: 2px 7px; border-radius: 20px;
+  display: flex; align-items: center; gap: 3px;
+}
+.mini-sent-dot { width: 5px; height: 5px; border-radius: 50%; }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   VARIATION A — Espresso Frame
+   Espresso = frame only (nav + footer). Body is white + linen.
+   Hex surface map:
+     page bg:      #F5F1EA  (linen)
+     card bg:      #FFFFFF  (white)
+     nav bg:       #4A342A  (espresso)
+     brief bg:     #FFFFFF  with camel accent line
+     section hdr:  #F5F1EA  with espresso text
+   ═══════════════════════════════════════════════════════════════ */
+
+.var-a .preview { background: #F5F1EA; }
+.var-a .mini-nav { background: #4A342A; }
+.var-a .mini-logo { color: #FFFFFF; }
+.var-a .mini-tab { color: rgba(255,255,255,0.45); }
+.var-a .mini-tab.active { color: #D7C9B8; }
+.var-a .live-badge { background: rgba(215,201,184,0.15); color: #D7C9B8; border: 1px solid rgba(215,201,184,0.25); }
+
+.var-a .mini-page { background: #F5F1EA; }
+.var-a .brief-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(74,52,42,0.1);
+  border-left: 3px solid #B2967D;
+}
+.var-a .brief-title  { color: #4A342A; }
+.var-a .brief-text   { color: #7D5A44; }
+.var-a .brief-point  { color: #78716c; }
+.var-a .brief-point-num { background: #F5F1EA; color: #B2967D; }
+
+.var-a .mini-card { background: #FFFFFF; border-color: rgba(74,52,42,0.1); }
+.var-a .mini-headline { color: #4A342A; }
+.var-a .mini-ai-box   { background: #F5F1EA; color: #7D5A44; }
+.var-a .mini-ai-label { color: #B2967D; }
+.var-a .mini-footer-row { border-color: rgba(74,52,42,0.07); color: #B2967D; }
+.var-a .mini-cat { background: #fff7ed; color: #9a3412; }
+.var-a .mini-sentiment.bearish { background: rgba(193,18,31,0.08); color: #c1121f; }
+.var-a .mini-sent-dot.bearish  { background: #c1121f; }
+
+/* ═══════════════════════════════════════════════════════════════
+   VARIATION B — Morning Warmth (Refined Current)
+   Espresso in nav. Brief card header is espresso. Everything else
+   white on linen. Camel/khaki as connective tissue.
+   Hex surface map:
+     page bg:       #F5F1EA  (linen)
+     card bg:       #FFFFFF  (white)
+     nav bg:        #4A342A  (espresso)
+     brief hdr bg:  #4A342A  (espresso — intentional premium signal)
+     brief body bg: #FFFFFF
+     section hdr:   #F5F1EA  with espresso text
+   ═══════════════════════════════════════════════════════════════ */
+
+.var-b .preview { background: #F5F1EA; }
+.var-b .mini-nav { background: #4A342A; }
+.var-b .mini-logo { color: #FFFFFF; }
+.var-b .mini-tab { color: rgba(255,255,255,0.45); }
+.var-b .mini-tab.active { color: #D7C9B8; }
+.var-b .live-badge { background: rgba(215,201,184,0.15); color: #D7C9B8; border: 1px solid rgba(215,201,184,0.25); }
+
+.var-b .mini-page { background: #F5F1EA; }
+.var-b .brief-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(74,52,42,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 0;
+}
+.var-b .brief-inner-hdr {
+  background: #4A342A;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.var-b .brief-inner-body { padding: 8px 12px 10px; }
+.var-b .brief-title  { color: #FFFFFF; font-size: 11px; font-weight: 700; }
+.var-b .brief-text   { color: #7D5A44; }
+.var-b .brief-point  { color: #78716c; }
+.var-b .brief-point-num { background: #F5F1EA; color: #B2967D; }
+
+.var-b .mini-card { background: #FFFFFF; border-color: rgba(74,52,42,0.1); }
+.var-b .mini-headline { color: #4A342A; }
+.var-b .mini-ai-box   { background: #F5F1EA; color: #7D5A44; }
+.var-b .mini-ai-label { color: #B2967D; }
+.var-b .mini-footer-row { border-color: rgba(74,52,42,0.07); color: #B2967D; }
+.var-b .mini-cat { background: #fff7ed; color: #9a3412; }
+.var-b .mini-sentiment.bearish { background: rgba(193,18,31,0.08); color: #c1121f; }
+.var-b .mini-sent-dot.bearish  { background: #c1121f; }
+
+/* ═══════════════════════════════════════════════════════════════
+   VARIATION C — Rich Blend
+   More espresso presence as deliberate premium signal.
+   Page bg is linen. Cards are white. Between-section breathing
+   room uses khaki tones instead of espresso fills.
+   Hex surface map:
+     page bg:       #F5F1EA  (linen)
+     card bg:       #FFFFFF  (white)
+     nav bg:        #4A342A  (espresso)
+     brief hdr bg:  #4A342A  (espresso)
+     section divider bg: #EDE8E0  (slightly darker linen)
+     accent borders: #D7C9B8  (khaki — replaces hairlines)
+   Key difference from B: khaki is used for card borders and
+   dividers (more visible), giving more visual structure without
+   more espresso fills.
+   ═══════════════════════════════════════════════════════════════ */
+
+.var-c .preview { background: #F5F1EA; }
+.var-c .mini-nav { background: #4A342A; }
+.var-c .mini-logo { color: #FFFFFF; }
+.var-c .mini-tab { color: rgba(255,255,255,0.45); }
+.var-c .mini-tab.active { color: #D7C9B8; }
+.var-c .live-badge { background: rgba(215,201,184,0.15); color: #D7C9B8; border: 1px solid rgba(215,201,184,0.25); }
+
+.var-c .mini-page { background: #F5F1EA; }
+.var-c .brief-card {
+  background: #FFFFFF;
+  border: 1px solid #D7C9B8;
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 0;
+}
+.var-c .brief-inner-hdr {
+  background: #4A342A;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.var-c .brief-inner-body { padding: 8px 12px 10px; }
+.var-c .brief-title  { color: #FFFFFF; font-size: 11px; font-weight: 700; }
+.var-c .brief-text   { color: #7D5A44; }
+.var-c .brief-point  { color: #78716c; }
+.var-c .brief-point-num { background: #F5F1EA; color: #B2967D; }
+
+/* Khaki borders — more structural feel */
+.var-c .mini-card { background: #FFFFFF; border-color: #D7C9B8; }
+.var-c .mini-headline { color: #4A342A; }
+.var-c .mini-ai-box   { background: #F5F1EA; color: #7D5A44; }
+.var-c .mini-ai-label { color: #B2967D; }
+.var-c .mini-footer-row { border-color: #D7C9B8; color: #B2967D; }
+.var-c .mini-cat { background: #fff7ed; color: #9a3412; }
+.var-c .mini-sentiment.bearish { background: rgba(193,18,31,0.08); color: #c1121f; }
+.var-c .mini-sent-dot.bearish  { background: #c1121f; }
+
+/* ─── Footer note ─────────────────────────────────────────────── */
+.note-row {
+  max-width: 1200px;
+  margin-top: 24px;
+  background: #FFFFFF;
+  border-radius: 8px;
+  border: 1px solid rgba(74,52,42,0.1);
+  padding: 16px 20px;
+}
+.note-row h3 { font-size: 12px; font-weight: 700; color: #4A342A; margin-bottom: 8px; }
+.note-row ul { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.note-row li { font-size: 11px; color: #78716c; line-height: 1.5; padding-left: 12px; position: relative; }
+.note-row li::before { content: "→"; position: absolute; left: 0; color: #B2967D; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<h1>AlphaBrief — Color Balance Options</h1>
+<p class="page-sub">Same palette, three surface ratios. Pick the one that feels right at 7am over coffee.</p>
+
+<div class="grid">
+
+  <!-- ══ VARIATION A: Espresso Frame ══════════════════════════ -->
+  <div class="variation var-a">
+    <div>
+      <div class="var-label">Option A</div>
+      <div class="var-title">Espresso Frame</div>
+      <div class="var-desc">Espresso is contained to the navigation bar only. All content surfaces are white cards on linen. Maximum readability for long sessions. Lightest feel — closest to a premium editorial magazine.</div>
+    </div>
+
+    <!-- Swatch strip -->
+    <div class="swatches">
+      <div class="swatch" style="background:#4A342A;" title="Nav #4A342A"></div>
+      <div class="swatch" style="background:#F5F1EA;" title="Page bg #F5F1EA"></div>
+      <div class="swatch" style="background:#FFFFFF;" title="Card #FFFFFF"></div>
+      <div class="swatch" style="background:#B2967D;" title="Accent #B2967D"></div>
+      <div class="swatch" style="background:#D7C9B8;" title="Border #D7C9B8"></div>
+      <div class="swatch" style="background:#2d6a4f;" title="Positive"></div>
+      <div class="swatch" style="background:#c1121f;" title="Negative"></div>
+    </div>
+
+    <!-- Preview -->
+    <div class="preview">
+      <!-- Nav -->
+      <div class="mini-nav">
+        <div class="mini-logo">AlphaBrief <span>AI Financial Research</span></div>
+        <div class="mini-tabs">
+          <div class="mini-tab active">Overview</div>
+          <div class="mini-tab">News</div>
+          <div class="mini-tab">Trends</div>
+        </div>
+        <div class="live-badge"><span class="live-dot"></span>LIVE</div>
+      </div>
+      <!-- Page -->
+      <div class="mini-page">
+        <!-- Daily Brief — white card with camel left border -->
+        <div class="brief-card">
+          <div class="brief-header">
+            <div class="brief-title" style="color:#4A342A;">AI Daily Brief</div>
+            <div class="brief-badge bearish"><span style="width:5px;height:5px;border-radius:50%;background:#c1121f;display:inline-block;"></span>BEARISH</div>
+          </div>
+          <div class="brief-text">Global markets face pressure as Fed signals higher-for-longer rates. SET index expected to open lower. Energy sector shows resilience.</div>
+          <div class="brief-points">
+            <div class="brief-point">
+              <div class="brief-point-num">1</div>
+              <div>Fed rate signals push bond yields to 4-month high</div>
+            </div>
+            <div class="brief-point">
+              <div class="brief-point-num">2</div>
+              <div>OPEC+ cuts support oil above $87 — watch PTT, PTTEP</div>
+            </div>
+          </div>
+        </div>
+        <!-- News card -->
+        <div class="mini-card">
+          <div class="mini-card-body">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;">
+              <div class="mini-headline">OPEC+ Extends Production Cuts, Oil Rises on Supply Signal</div>
+              <div class="mini-sentiment bearish" style="flex-shrink:0;">
+                <span class="mini-sent-dot bearish"></span>BEARISH
+              </div>
+            </div>
+            <div class="mini-ai-box">
+              <div class="mini-ai-label" style="color:#B2967D;">AI IMPACT</div>
+              Supply restriction signal is negative for energy-importing economies. Consumer Goods and Transport face cost pressure.
+            </div>
+            <div class="mini-stocks">
+              <span class="mini-stock up">▲ PTT</span>
+              <span class="mini-stock up">▲ PTTEP</span>
+              <span class="mini-stock down">▼ AAV</span>
+            </div>
+            <div class="mini-footer-row">
+              <span>Reuters · 2 hrs ago</span>
+              <span class="mini-cat" style="background:#fff7ed;color:#9a3412;">ENERGY</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VARIATION B: Morning Warmth ══════════════════════════ -->
+  <div class="variation var-b">
+    <div>
+      <div class="var-label">Option B</div>
+      <div class="var-title">Morning Warmth</div>
+      <div class="var-desc">Espresso nav stays. The AI Daily Brief card uses an espresso header as a deliberate premium anchor. All other cards are white on linen. Balances warmth and authority without heaviness.</div>
+    </div>
+
+    <!-- Swatch strip -->
+    <div class="swatches">
+      <div class="swatch" style="background:#4A342A;" title="Nav + Brief hdr #4A342A"></div>
+      <div class="swatch" style="background:#F5F1EA;" title="Page bg #F5F1EA"></div>
+      <div class="swatch" style="background:#FFFFFF;" title="Card #FFFFFF"></div>
+      <div class="swatch" style="background:#B2967D;" title="Accent #B2967D"></div>
+      <div class="swatch" style="background:#D7C9B8;" title="Border #D7C9B8"></div>
+      <div class="swatch" style="background:#2d6a4f;" title="Positive"></div>
+      <div class="swatch" style="background:#c1121f;" title="Negative"></div>
+    </div>
+
+    <!-- Preview -->
+    <div class="preview">
+      <!-- Nav -->
+      <div class="mini-nav">
+        <div class="mini-logo">AlphaBrief <span>AI Financial Research</span></div>
+        <div class="mini-tabs">
+          <div class="mini-tab active">Overview</div>
+          <div class="mini-tab">News</div>
+          <div class="mini-tab">Trends</div>
+        </div>
+        <div class="live-badge"><span class="live-dot"></span>LIVE</div>
+      </div>
+      <!-- Page -->
+      <div class="mini-page">
+        <!-- Daily Brief — espresso header, white body -->
+        <div class="brief-card">
+          <div class="brief-inner-hdr">
+            <div class="brief-title">AI Daily Brief · ภาพรวมตลาด</div>
+            <div class="brief-badge bearish"><span style="width:5px;height:5px;border-radius:50%;background:#c1121f;display:inline-block;"></span>BEARISH</div>
+          </div>
+          <div class="brief-inner-body">
+            <div class="brief-text">Global markets face pressure as Fed signals higher-for-longer rates. SET index expected to open lower. Energy sector shows resilience.</div>
+            <div class="brief-points">
+              <div class="brief-point">
+                <div class="brief-point-num">1</div>
+                <div>Fed rate signals push bond yields to 4-month high</div>
+              </div>
+              <div class="brief-point">
+                <div class="brief-point-num">2</div>
+                <div>OPEC+ cuts support oil above $87 — watch PTT, PTTEP</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- News card -->
+        <div class="mini-card">
+          <div class="mini-card-body">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;">
+              <div class="mini-headline">OPEC+ Extends Production Cuts, Oil Rises on Supply Signal</div>
+              <div class="mini-sentiment bearish" style="flex-shrink:0;">
+                <span class="mini-sent-dot bearish"></span>BEARISH
+              </div>
+            </div>
+            <div class="mini-ai-box">
+              <div class="mini-ai-label" style="color:#B2967D;">AI IMPACT</div>
+              Supply restriction signal is negative for energy-importing economies. Consumer Goods and Transport face cost pressure.
+            </div>
+            <div class="mini-stocks">
+              <span class="mini-stock up">▲ PTT</span>
+              <span class="mini-stock up">▲ PTTEP</span>
+              <span class="mini-stock down">▼ AAV</span>
+            </div>
+            <div class="mini-footer-row">
+              <span>Reuters · 2 hrs ago</span>
+              <span class="mini-cat" style="background:#fff7ed;color:#9a3412;">ENERGY</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VARIATION C: Rich Blend ═══════════════════════════════ -->
+  <div class="variation var-c">
+    <div>
+      <div class="var-label">Option C</div>
+      <div class="var-title">Rich Blend</div>
+      <div class="var-desc">Same as B but card borders use khaki (#D7C9B8) instead of hairline gray — more visible structure and warmth. Between-sections breathing room uses a slightly deeper linen tone. Premium without heaviness.</div>
+    </div>
+
+    <!-- Swatch strip -->
+    <div class="swatches">
+      <div class="swatch" style="background:#4A342A;" title="Nav + Brief hdr"></div>
+      <div class="swatch" style="background:#EDE8E0;" title="Section bg #EDE8E0"></div>
+      <div class="swatch" style="background:#F5F1EA;" title="Page bg #F5F1EA"></div>
+      <div class="swatch" style="background:#FFFFFF;" title="Card #FFFFFF"></div>
+      <div class="swatch" style="background:#D7C9B8;" title="Card border / divider"></div>
+      <div class="swatch" style="background:#B2967D;" title="Accent #B2967D"></div>
+      <div class="swatch" style="background:#2d6a4f;" title="Positive"></div>
+      <div class="swatch" style="background:#c1121f;" title="Negative"></div>
+    </div>
+
+    <!-- Preview -->
+    <div class="preview">
+      <!-- Nav -->
+      <div class="mini-nav">
+        <div class="mini-logo">AlphaBrief <span>AI Financial Research</span></div>
+        <div class="mini-tabs">
+          <div class="mini-tab active">Overview</div>
+          <div class="mini-tab">News</div>
+          <div class="mini-tab">Trends</div>
+        </div>
+        <div class="live-badge"><span class="live-dot"></span>LIVE</div>
+      </div>
+      <!-- Page -->
+      <div class="mini-page" style="background:#EDE8E0;">
+        <!-- Daily Brief — espresso header, white body, khaki border -->
+        <div class="brief-card">
+          <div class="brief-inner-hdr">
+            <div class="brief-title">AI Daily Brief · ภาพรวมตลาด</div>
+            <div class="brief-badge bearish"><span style="width:5px;height:5px;border-radius:50%;background:#c1121f;display:inline-block;"></span>BEARISH</div>
+          </div>
+          <div class="brief-inner-body">
+            <div class="brief-text">Global markets face pressure as Fed signals higher-for-longer rates. SET index expected to open lower. Energy sector shows resilience.</div>
+            <div class="brief-points">
+              <div class="brief-point">
+                <div class="brief-point-num">1</div>
+                <div>Fed rate signals push bond yields to 4-month high</div>
+              </div>
+              <div class="brief-point">
+                <div class="brief-point-num">2</div>
+                <div>OPEC+ cuts support oil above $87 — watch PTT, PTTEP</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- News card — khaki border -->
+        <div class="mini-card">
+          <div class="mini-card-body">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;">
+              <div class="mini-headline">OPEC+ Extends Production Cuts, Oil Rises on Supply Signal</div>
+              <div class="mini-sentiment bearish" style="flex-shrink:0;">
+                <span class="mini-sent-dot bearish"></span>BEARISH
+              </div>
+            </div>
+            <div class="mini-ai-box">
+              <div class="mini-ai-label" style="color:#B2967D;">AI IMPACT</div>
+              Supply restriction signal is negative for energy-importing economies. Consumer Goods and Transport face cost pressure.
+            </div>
+            <div class="mini-stocks">
+              <span class="mini-stock up">▲ PTT</span>
+              <span class="mini-stock up">▲ PTTEP</span>
+              <span class="mini-stock down">▼ AAV</span>
+            </div>
+            <div class="mini-footer-row">
+              <span>Reuters · 2 hrs ago</span>
+              <span class="mini-cat" style="background:#fff7ed;color:#9a3412;">ENERGY</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Note -->
+<div class="note-row">
+  <h3>What differs between options (everything else is identical)</h3>
+  <ul>
+    <li><strong>A:</strong> Espresso only in the nav bar. Daily Brief is a white card with a camel left-border accent. Lightest feel — most like an editorial magazine. No espresso fill anywhere in the content area.</li>
+    <li><strong>B:</strong> Espresso nav + espresso Daily Brief header. The brief header serves as a deliberate "gravity anchor" for the page — draws the eye immediately. All other cards are white on linen. This is a refinement of your current approach.</li>
+    <li><strong>C:</strong> Same as B but with khaki (#D7C9B8) card borders and a slightly deeper linen page background (#EDE8E0). Adds more visual structure and warmth without adding espresso fills. Feels most layered and premium.</li>
+    <li><strong>Sentiment badge (all options):</strong> dot + label pill — satisfies WCAG 2.1 AA non-color indicator requirement.</li>
+    <li><strong>Card hierarchy (all options):</strong> Headline + sentiment → AI impact → stocks → source/time/category footer (as per your preferred scan order).</li>
+  </ul>
+</div>
+
+</body>
+</html>
