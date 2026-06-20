@@ -1,0 +1,65 @@
+export interface StockImpact {
+  symbol: string;
+  direction: "positive" | "negative" | "neutral";
+  reason?: string;
+}
+
+export interface NewsItem {
+  id: string;
+  title: string;
+  summary: string;
+  category: string;
+  published_at: string;
+  source: string;
+  ai_analysis: string;
+  stock_impacts: StockImpact[];
+  featured: boolean;
+}
+
+export interface MarketIndex {
+  name: string;
+  symbol: string;
+  price: number;
+  change: number;
+  change_pct: number;
+  market: string;
+}
+
+export interface SectorPerformance {
+  name: string;
+  change_pct: number;
+  level: "strong_up" | "up" | "flat" | "down" | "strong_down";
+}
+
+export interface TrendItem {
+  rank: number;
+  title: string;
+  description: string;
+  sentiment: "bullish" | "bearish" | "neutral";
+}
+
+export interface AISummary {
+  date: string;
+  overview: string;
+  key_points: string[];
+  watch_sectors: string[];
+  avoid_sectors: string[];
+  set_range_low: number;
+  set_range_high: number;
+}
+
+export interface MarketOverview {
+  indices: MarketIndex[];
+  sectors: SectorPerformance[];
+  trends: TrendItem[];
+  ai_summary: AISummary;
+  last_updated: string;
+  news_count: number;
+}
+
+export interface TickerItem {
+  symbol: string;
+  price: number;
+  change: number;
+  change_pct: number;
+}

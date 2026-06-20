@@ -1,0 +1,110 @@
+import { api } from "@/lib/api";
+import Navbar from "@/components/Navbar";
+import TickerBar from "@/components/TickerBar";
+import NewsFeed from "@/components/NewsFeed";
+import MarketOverviewWidget from "@/components/MarketOverviewWidget";
+import SectorHeatmap from "@/components/SectorHeatmap";
+import TrendSummary from "@/components/TrendSummary";
+import AISummaryCard from "@/components/AISummaryCard";
+
+export const revalidate = 60;
+
+export default async function HomePage() {
+  const [news, overview, ticker] = await Promise.all([
+    api.getNews(),
+    api.getMarketOverview(),
+    api.getTicker(),
+  ]);
+
+  return (
+    <>
+      <Navbar />
+      <TickerBar items={ticker} />
+
+      {/* Page header bar */}
+      <div className="border-b px-6 py-3 flex items-center justify-between"
+        style={{ backgroundColor: "#F5F1EA", borderColor: "rgba(74,52,42,0.1)" }}>
+        <div>
+          <h1 className="text-base font-bold" style={{ color: "#4A342A" }}>
+            Market Overview <span className="font-normal text-sm ml-1" style={{ color: "#B2967D" }}>ภาพรวมตลาด</span>
+          </h1>
+        </div>
+        <div className="flex items-center gap-4 text-xs">
+          <div className="flex items-center gap-4">
+            {[
+              { label: "NEWS TODAY", value: overview.news_count },
+              { label: "STOCKS COVERED", value: "312" },
+              { label: "UPDATE", value: `${overview.last_updated}` },
+            ].map((s) => (
+              <div key={s.label} className="text-right">
+                <div className="font-bold font-mono" style={{ color: "#4A342A" }}>{s.value}</div>
+                <div className="tracking-widest" style={{ color: "#B2967D" }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded"
+            style={{ backgroundColor: "#4A342A", color: "#D7C9B8" }}>
+            <span className="live-dot w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
+            LIVE
+          </div>
+        </div>
+      </div>
+
+      <main className="max-w-screen-xl mx-auto px-4 py-5">
+        {/* Search */}
+        <div className="bg-white rounded-lg border flex items-center gap-3 px-4 py-2.5 mb-5"
+          style={{ borderColor: "rgba(74,52,42,0.12)" }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D7C9B8"
+            strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text"
+            placeholder="Search news, stocks, sectors... / ค้นหาข่าว หุ้น กลุ่มอุตสาหกรรม"
+            className="flex-1 outline-none text-sm bg-transparent"
+            style={{ color: "#4A342A" }} />
+          <span className="text-xs hidden md:block font-mono" style={{ color: "#D7C9B8" }}>
+            PTT · KBANK · FED · OIL
+          </span>
+        </div>
+
+        {/* Content grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-5 items-start">
+
+          {/* News feed */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-5 rounded-full" style={{ backgroundColor: "#B2967D" }} />
+                <span className="text-sm font-bold" style={{ color: "#4A342A" }}>Financial News</span>
+                <span className="text-sm" style={{ color: "#B2967D" }}>· ข่าวการเงิน</span>
+              </div>
+              <a href="/news" className="text-xs font-bold tracking-widest uppercase hover:underline"
+                style={{ color: "#B2967D" }}>
+                View All →
+              </a>
+            </div>
+            <NewsFeed news={news} />
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-4">
+            <AISummaryCard summary={overview.ai_summary} />
+            <MarketOverviewWidget indices={overview.indices} />
+            <SectorHeatmap sectors={overview.sectors} />
+            <TrendSummary trends={overview.trends} />
+          </div>
+        </div>
+      </main>
+
+      <footer className="border-t mt-8 px-6 py-5 flex items-center justify-between text-xs"
+        style={{ backgroundColor: "#4A342A", borderColor: "rgba(215,201,184,0.1)", color: "rgba(215,201,184,0.4)" }}>
+        <div className="flex items-center gap-2">
+          <span className="font-bold text-sm" style={{ color: "#D7C9B8" }}>AlphaBrief</span>
+          <span>·</span>
+          <span>AI Financial Research Assistant</span>
+        </div>
+        <div>For educational purposes only. Not investment advice.</div>
+      </footer>
+    </>
+  );
+}
