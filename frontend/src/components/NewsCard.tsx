@@ -7,7 +7,6 @@ const CATEGORY_STYLES: Record<string, { bg: string; text: string; label: string 
   "หุ้นไทย":    { bg: "#f0fdf4", text: "#14532d", label: "SET" },
   "เทคโนโลยี":  { bg: "#faf5ff", text: "#581c87", label: "TECH" },
   "ตลาดโลก":    { bg: "#eff6ff", text: "#1e3a8a", label: "GLOBAL" },
-  "การเงิน":     { bg: "#f0fdfa", text: "#134e4a", label: "FINANCE" },
 };
 
 interface Props { news: NewsItem }

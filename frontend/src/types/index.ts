@@ -1,7 +1,7 @@
 export interface StockImpact {
   symbol: string;
   direction: "positive" | "negative" | "neutral";
-  reason?: string;
+  reason: string | null;
 }
 
 export interface AIAnalysis {

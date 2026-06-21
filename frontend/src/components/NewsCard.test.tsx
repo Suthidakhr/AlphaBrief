@@ -19,9 +19,9 @@ const VALID_NEWS: NewsItem = {
     analysis_at: '2026-06-21T01:30:00Z',
   },
   stock_impacts: [
-    { symbol: 'SPALI', direction: 'positive' },
-    { symbol: 'KBANK', direction: 'neutral' },
-    { symbol: 'AAV', direction: 'negative' },
+    { symbol: 'SPALI', direction: 'positive', reason: null },
+    { symbol: 'KBANK', direction: 'neutral', reason: null },
+    { symbol: 'AAV', direction: 'negative', reason: null },
   ],
   featured: false,
 }
