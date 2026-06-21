@@ -1,5 +1,5 @@
 ---
-status: review
+status: done
 epic: 2
 story: 1
 story_key: "2-1-pydantic-schemas-and-typescript-types-for-news-domain"
@@ -9,7 +9,7 @@ baseline_commit: b78ce6cf2e7c526d42538fac94195f058a792f3b
 
 # Story 2.1: Pydantic Schemas & TypeScript Types for the News Domain
 
-Status: review
+Status: done
 
 ## Story
 
