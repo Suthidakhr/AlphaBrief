@@ -7,10 +7,8 @@ import SectorHeatmap from "@/components/SectorHeatmap";
 import TrendSummary from "@/components/TrendSummary";
 import AISummaryCard from "@/components/AISummaryCard";
 
-export const revalidate = 60;
-
 export default async function HomePage() {
-  const [news, overview, ticker] = await Promise.all([
+  const [newsResponse, overview, ticker] = await Promise.all([
     api.getNews(),
     api.getMarketOverview(),
     api.getTicker(),
@@ -83,7 +81,7 @@ export default async function HomePage() {
                 View All →
               </a>
             </div>
-            <NewsFeed news={news} />
+            <NewsFeed news={newsResponse.items} />
           </div>
 
           {/* Sidebar */}

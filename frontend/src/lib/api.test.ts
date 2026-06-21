@@ -13,7 +13,7 @@ afterEach(() => {
 
 describe('api.getNews', () => {
   it('calls fetch with /news/ path when no category given', async () => {
-    const fetchMock = makeFetch([])
+    const fetchMock = makeFetch({ items: [], last_updated: null })
     vi.stubGlobal('fetch', fetchMock)
     await api.getNews()
     expect(fetchMock).toHaveBeenCalledWith(
@@ -23,7 +23,7 @@ describe('api.getNews', () => {
   })
 
   it('includes URL-encoded category in query string', async () => {
-    const fetchMock = makeFetch([])
+    const fetchMock = makeFetch({ items: [], last_updated: null })
     vi.stubGlobal('fetch', fetchMock)
     await api.getNews('พลังงาน')
     expect(fetchMock).toHaveBeenCalledWith(

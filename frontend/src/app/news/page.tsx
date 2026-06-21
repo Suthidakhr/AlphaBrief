@@ -3,10 +3,8 @@ import Navbar from "@/components/Navbar";
 import TickerBar from "@/components/TickerBar";
 import NewsFeed from "@/components/NewsFeed";
 
-export const revalidate = 60;
-
 export default async function NewsPage() {
-  const [news, ticker] = await Promise.all([api.getNews(), api.getTicker()]);
+  const [newsResponse, ticker] = await Promise.all([api.getNews(), api.getTicker()]);
 
   return (
     <>
@@ -22,7 +20,7 @@ export default async function NewsPage() {
         </div>
         <div className="flex items-center gap-6 text-xs">
           <div className="text-right">
-            <div className="font-bold font-mono" style={{ color: "#4A342A" }}>{news.length}</div>
+            <div className="font-bold font-mono" style={{ color: "#4A342A" }}>{newsResponse.items.length}</div>
             <div className="tracking-widest" style={{ color: "#B2967D" }}>STORIES TODAY</div>
           </div>
           <div className="text-right">
@@ -33,7 +31,7 @@ export default async function NewsPage() {
       </div>
 
       <main className="max-w-3xl mx-auto px-4 py-6">
-        <NewsFeed news={news} />
+        <NewsFeed news={newsResponse.items} />
       </main>
 
       <footer className="border-t mt-8 px-6 py-5 flex items-center justify-between text-xs"

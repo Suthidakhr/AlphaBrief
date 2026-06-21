@@ -26,6 +26,11 @@ export interface NewsItem {
   featured: boolean;
 }
 
+export interface NewsListResponse {
+  items: NewsItem[];
+  last_updated: string | null;
+}
+
 export interface MarketIndex {
   name: string;
   symbol: string;

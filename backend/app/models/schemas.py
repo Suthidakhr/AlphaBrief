@@ -2,6 +2,8 @@ from typing import Literal
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict
 
+NewsCategory = Literal["ดอกเบี้ยโลก", "พลังงาน", "หุ้นไทย", "เทคโนโลยี", "ตลาดโลก"]
+
 
 class StockImpact(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -29,12 +31,19 @@ class NewsItem(BaseModel):
     summary: str
     source_url: str
     content: str
-    category: Literal["ดอกเบี้ยโลก", "พลังงาน", "หุ้นไทย", "เทคโนโลยี", "ตลาดโลก"]
+    category: NewsCategory
     published_at: AwareDatetime
     source: str
     ai_analysis: AIAnalysis | None = None
     stock_impacts: list[StockImpact]
     featured: bool = False
+
+
+class NewsListResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    items: list[NewsItem]
+    last_updated: AwareDatetime | None
 
 
 class MarketIndex(BaseModel):

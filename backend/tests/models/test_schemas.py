@@ -9,6 +9,7 @@ from app.models.schemas import (
     MarketIndex,
     MarketOverview,
     NewsItem,
+    NewsListResponse,
     SectorPerformance,
     StockImpact,
     TrendItem,
@@ -301,3 +302,35 @@ def test_market_overview_last_updated_required():
     data = {**VALID_MARKET_OVERVIEW, "last_updated": None}
     with pytest.raises(ValidationError):
         MarketOverview(**data)
+
+
+# ---------------------------------------------------------------------------
+# Story 2.2 — NewsListResponse
+# ---------------------------------------------------------------------------
+
+
+def test_news_list_response_valid_construction():
+    news_item = NewsItem(**VALID_NEWS_ITEM)
+    response = NewsListResponse(
+        items=[news_item],
+        last_updated=datetime(2026, 6, 21, 5, 30, tzinfo=timezone.utc),
+    )
+    assert len(response.items) == 1
+    assert response.last_updated.tzinfo is not None
+
+
+def test_news_list_response_last_updated_naive_rejected():
+    news_item = NewsItem(**VALID_NEWS_ITEM)
+    with pytest.raises(ValidationError):
+        NewsListResponse(
+            items=[news_item],
+            last_updated=datetime(2026, 6, 21, 5, 30),
+        )
+
+
+def test_news_list_response_empty_items_valid():
+    response = NewsListResponse(
+        items=[],
+        last_updated=datetime(2026, 6, 21, 5, 30, tzinfo=timezone.utc),
+    )
+    assert response.items == []

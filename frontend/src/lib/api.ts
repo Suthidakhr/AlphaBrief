@@ -1,4 +1,4 @@
-import { NewsItem, MarketOverview, TickerItem } from "@/types";
+import { NewsItem, NewsListResponse, MarketOverview, TickerItem } from "@/types";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -13,7 +13,7 @@ async function fetchAPI<T>(path: string): Promise<T> {
 export const api = {
   getNews: (category?: string) => {
     const qs = category ? `?category=${encodeURIComponent(category)}` : "";
-    return fetchAPI<NewsItem[]>(`/news/${qs}`);
+    return fetchAPI<NewsListResponse>(`/news/${qs}`);
   },
 
   getNewsById: (id: string) => fetchAPI<NewsItem>(`/news/${id}`),
