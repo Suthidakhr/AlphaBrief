@@ -2,6 +2,12 @@ import { render, screen } from '@testing-library/react'
 import NewsCard from './NewsCard'
 import { NewsItem } from '@/types'
 
+vi.mock('next/link', () => ({
+  default: ({ children, href, className }: { children: React.ReactNode; href: string; className?: string }) => (
+    <a href={href} className={className}>{children}</a>
+  ),
+}))
+
 const VALID_NEWS: NewsItem = {
   id: 'news-001',
   headline: 'เฟดส่งสัญญาณลดดอกเบี้ย',
@@ -9,14 +15,14 @@ const VALID_NEWS: NewsItem = {
   source_url: 'https://bloomberg.com/test-article',
   content: 'Full article content for testing.',
   category: 'ดอกเบี้ยโลก',
-  published_at: '2026-06-21T01:15:00Z',
+  published_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
   source: 'Bloomberg',
   ai_analysis: {
     summary: 'สัญญาณบวกที่ชัดเจน',
     affected_sectors: ['อสังหาฯ'],
     affected_stocks: ['SPALI'],
     sentiment: 'bullish',
-    analysis_at: '2026-06-21T01:30:00Z',
+    analysis_at: new Date().toISOString(),
   },
   stock_impacts: [
     { symbol: 'SPALI', direction: 'positive', reason: null },
@@ -42,32 +48,48 @@ describe('NewsCard', () => {
     expect(screen.getByText('RATES')).toBeInTheDocument()
   })
 
-  it('renders ai_analysis summary text', () => {
+  it('renders ai_analysis summary text via AIInsightBox', () => {
     render(<NewsCard news={VALID_NEWS} />)
     expect(screen.getByText('สัญญาณบวกที่ชัดเจน')).toBeInTheDocument()
   })
 
-  it('renders "Analysis pending" when ai_analysis is null', () => {
+  it('AIInsightBox shows pending state when ai_analysis is null', () => {
     render(<NewsCard news={{ ...VALID_NEWS, ai_analysis: null }} />)
-    expect(screen.getByText('Analysis pending')).toBeInTheDocument()
+    expect(screen.getByText('Analysis in progress')).toBeInTheDocument()
   })
 
-  it('renders positive stock impact badge with ▲ arrow', () => {
-    render(<NewsCard news={{ ...VALID_NEWS, stock_impacts: [{ symbol: 'SPALI', direction: 'positive', reason: null }] }} />)
-    const badge = screen.getByText('SPALI').closest('span')
+  it('SentimentBadge is hidden when ai_analysis is null', () => {
+    render(<NewsCard news={{ ...VALID_NEWS, ai_analysis: null }} />)
+    expect(screen.queryByLabelText(/Market sentiment/i)).not.toBeInTheDocument()
+  })
+
+  it('stock badges are hidden when ai_analysis is null', () => {
+    const { container } = render(<NewsCard news={{ ...VALID_NEWS, ai_analysis: null }} />)
+    expect(container.querySelector('[aria-label="SPALI: rising"]')).toBeNull()
+  })
+
+  it('positive stock impact badge has ▲ arrow and aria-label', () => {
+    const { container } = render(<NewsCard news={{ ...VALID_NEWS, stock_impacts: [{ symbol: 'SPALI', direction: 'positive', reason: null }] }} />)
+    const badge = container.querySelector('[aria-label="SPALI: rising"]') as HTMLElement
+    expect(badge).toBeTruthy()
     expect(badge).toHaveTextContent('▲')
+    expect(badge).toHaveTextContent('SPALI')
   })
 
-  it('renders neutral stock impact badge with – arrow', () => {
-    render(<NewsCard news={{ ...VALID_NEWS, stock_impacts: [{ symbol: 'KBANK', direction: 'neutral', reason: null }] }} />)
-    const badge = screen.getByText('KBANK').closest('span')
+  it('neutral stock impact badge has – dash and aria-label', () => {
+    const { container } = render(<NewsCard news={{ ...VALID_NEWS, stock_impacts: [{ symbol: 'KBANK', direction: 'neutral', reason: null }] }} />)
+    const badge = container.querySelector('[aria-label="KBANK: unchanged"]') as HTMLElement
+    expect(badge).toBeTruthy()
     expect(badge).toHaveTextContent('–')
+    expect(badge).toHaveTextContent('KBANK')
   })
 
-  it('renders negative stock impact badge with ▼ arrow', () => {
-    render(<NewsCard news={{ ...VALID_NEWS, stock_impacts: [{ symbol: 'AAV', direction: 'negative', reason: null }] }} />)
-    const badge = screen.getByText('AAV').closest('span')
+  it('negative stock impact badge has ▼ arrow and aria-label', () => {
+    const { container } = render(<NewsCard news={{ ...VALID_NEWS, stock_impacts: [{ symbol: 'AAV', direction: 'negative', reason: null }] }} />)
+    const badge = container.querySelector('[aria-label="AAV: falling"]') as HTMLElement
+    expect(badge).toBeTruthy()
     expect(badge).toHaveTextContent('▼')
+    expect(badge).toHaveTextContent('AAV')
   })
 
   it('featured card applies camel left border style', () => {
@@ -89,5 +111,22 @@ describe('NewsCard', () => {
   it('unknown category falls back gracefully', () => {
     render(<NewsCard news={{ ...VALID_NEWS, category: 'อื่นๆ' as never }} />)
     expect(screen.getByText('อื่นๆ')).toBeInTheDocument()
+  })
+
+  it('card contains a link navigating to /news/[id]', () => {
+    render(<NewsCard news={VALID_NEWS} />)
+    expect(screen.getByRole('link')).toHaveAttribute('href', '/news/news-001')
+  })
+
+  it('source name renders as plain text when source_url is null', () => {
+    render(<NewsCard news={{ ...VALID_NEWS, source_url: null }} />)
+    const sourceEl = screen.getByText('Bloomberg')
+    expect(sourceEl).toBeInTheDocument()
+    expect(sourceEl.tagName).not.toBe('A')
+  })
+
+  it('relative time is shown in the footer', () => {
+    render(<NewsCard news={VALID_NEWS} />)
+    expect(screen.getByText('2h ago')).toBeInTheDocument()
   })
 })

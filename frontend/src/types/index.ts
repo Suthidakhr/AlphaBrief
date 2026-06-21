@@ -16,7 +16,7 @@ export interface NewsItem {
   id: string;
   headline: string;
   summary: string;
-  source_url: string;
+  source_url: string | null;
   content: string;
   category: "ดอกเบี้ยโลก" | "พลังงาน" | "หุ้นไทย" | "เทคโนโลยี" | "ตลาดโลก";
   published_at: string;

@@ -1,5 +1,10 @@
 # Deferred Work Log
 
+## Deferred from: code review of 2-5-newscard-component (2026-06-21)
+
+- **D1: `getByRole('link')` in NewsCard test has silent coupling to child component links** — `screen.getByRole('link')` (NewsCard.test.tsx line ~118) throws "Found multiple elements" if SentimentBadge or AIInsightBox ever renders an `<a>` element. Currently safe, but creates invisible brittleness. Resolve by adding `{ name: /เฟด/i }` filter or using `container.querySelector('a')` pattern.
+- **D2: `<article>` has no accessible name** — ARIA APG recommends that repeated landmark regions of the same type have distinct labels. NewsCard renders many `<article>` elements in a feed; screen readers cannot distinguish them in landmark navigation. Fix: add `aria-labelledby` pointing to the inner `<h2>` id. Pre-existing from before Story 2.5. Track in Story 2.9 WCAG audit pass.
+
 ## Deferred from: code review of 2-4-sentimentbadge-and-aiinsightbox-components (2026-06-21)
 
 - **D1: No runtime defense in SentimentBadge for unknown sentiment values** — `SENTIMENT_STYLES[unexpected]` returns `undefined`; destructuring throws a runtime crash if the API ever sends an unrecognized value (e.g. `"mixed"` or casing mismatch). TypeScript compile-time enforcement is currently the only guard. Add a `?? SENTIMENT_STYLES.neutral` fallback when the component is touched in a future token/cleanup pass.
