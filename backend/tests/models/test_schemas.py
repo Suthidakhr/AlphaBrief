@@ -4,6 +4,7 @@ import pytest
 from pydantic import ValidationError
 
 from app.models.schemas import (
+    AIAnalysis,
     AISummary,
     MarketIndex,
     MarketOverview,
@@ -19,14 +20,24 @@ from app.models.schemas import (
 
 VALID_STOCK_IMPACT = {"symbol": "PTT", "direction": "positive"}
 
+VALID_AI_ANALYSIS = {
+    "summary": "Test analysis summary",
+    "affected_sectors": ["พลังงาน", "ธนาคาร"],
+    "affected_stocks": ["PTT", "KBANK"],
+    "sentiment": "bullish",
+    "analysis_at": datetime(2026, 6, 21, 1, 30, tzinfo=timezone.utc),
+}
+
 VALID_NEWS_ITEM = {
     "id": "news-001",
-    "title": "Test headline",
+    "headline": "Test headline",
     "summary": "Test summary",
+    "source_url": "https://reuters.com/test-article",
+    "content": "Full article content goes here.",
     "category": "พลังงาน",
     "published_at": datetime(2026, 6, 21, 1, 15, tzinfo=timezone.utc),
     "source": "Reuters",
-    "ai_analysis": "Test analysis",
+    "ai_analysis": VALID_AI_ANALYSIS,
     "stock_impacts": [VALID_STOCK_IMPACT],
     "featured": False,
 }
@@ -70,7 +81,83 @@ VALID_MARKET_OVERVIEW = {
 
 
 # ---------------------------------------------------------------------------
-# AC3 — AwareDatetime enforcement on NewsItem.published_at
+# AC1 — AIAnalysis model
+# ---------------------------------------------------------------------------
+
+
+def test_ai_analysis_valid_construction():
+    obj = AIAnalysis(**VALID_AI_ANALYSIS)
+    assert obj.sentiment == "bullish"
+    assert obj.analysis_at.tzinfo is not None
+
+
+def test_ai_analysis_aware_datetime_accepted():
+    obj = AIAnalysis(**VALID_AI_ANALYSIS)
+    assert obj.analysis_at.tzinfo is not None
+
+
+def test_ai_analysis_naive_datetime_rejected():
+    data = {**VALID_AI_ANALYSIS, "analysis_at": datetime(2026, 6, 21, 1, 30)}
+    with pytest.raises(ValidationError):
+        AIAnalysis(**data)
+
+
+@pytest.mark.parametrize("sentiment", ["bullish", "bearish", "neutral"])
+def test_ai_analysis_valid_sentiments(sentiment):
+    data = {**VALID_AI_ANALYSIS, "sentiment": sentiment}
+    obj = AIAnalysis(**data)
+    assert obj.sentiment == sentiment
+
+
+def test_ai_analysis_invalid_sentiment_rejected():
+    data = {**VALID_AI_ANALYSIS, "sentiment": "up"}
+    with pytest.raises(ValidationError):
+        AIAnalysis(**data)
+
+
+def test_ai_analysis_summary_required():
+    data = {**VALID_AI_ANALYSIS, "summary": None}
+    with pytest.raises(ValidationError):
+        AIAnalysis(**data)
+
+
+# ---------------------------------------------------------------------------
+# AC2/AC3 — NewsItem category Literal enforcement
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("cat", ["ดอกเบี้ยโลก", "พลังงาน", "หุ้นไทย", "เทคโนโลยี", "ตลาดโลก"])
+def test_news_item_valid_category_values(cat):
+    data = {**VALID_NEWS_ITEM, "category": cat}
+    item = NewsItem(**data)
+    assert item.category == cat
+
+
+def test_news_item_invalid_category_rejected():
+    data = {**VALID_NEWS_ITEM, "category": "Technology"}
+    with pytest.raises(ValidationError):
+        NewsItem(**data)
+
+
+# ---------------------------------------------------------------------------
+# AC2 — NewsItem ai_analysis nullable
+# ---------------------------------------------------------------------------
+
+
+def test_news_item_ai_analysis_nullable():
+    data = {**VALID_NEWS_ITEM, "ai_analysis": None}
+    item = NewsItem(**data)
+    assert item.ai_analysis is None
+
+
+def test_news_item_ai_analysis_with_object():
+    item = NewsItem(**VALID_NEWS_ITEM)
+    assert item.ai_analysis is not None
+    assert item.ai_analysis.sentiment == "bullish"
+
+
+# ---------------------------------------------------------------------------
+# AC5 — AwareDatetime enforcement on NewsItem.published_at
 # ---------------------------------------------------------------------------
 
 
@@ -92,7 +179,7 @@ def test_news_item_aware_datetime_string_accepted():
 
 
 # ---------------------------------------------------------------------------
-# AC4 — StockImpact validation
+# AC2 — StockImpact validation
 # ---------------------------------------------------------------------------
 
 
@@ -118,11 +205,11 @@ def test_stock_impact_symbol_required():
 
 
 # ---------------------------------------------------------------------------
-# AC4 — NewsItem non-nullable fields
+# AC2 — NewsItem non-nullable fields
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("field", ["id", "title", "summary", "category", "source", "ai_analysis"])
+@pytest.mark.parametrize("field", ["id", "headline", "summary", "source_url", "content", "category", "source"])
 def test_news_item_non_nullable_string_fields(field):
     data = {**VALID_NEWS_ITEM, field: None}
     with pytest.raises(ValidationError):
@@ -136,7 +223,7 @@ def test_news_item_published_at_required():
 
 
 # ---------------------------------------------------------------------------
-# AC4 — MarketIndex non-nullable fields
+# AC2 — MarketIndex non-nullable fields
 # ---------------------------------------------------------------------------
 
 
@@ -155,7 +242,7 @@ def test_market_index_non_nullable_numeric_fields(field):
 
 
 # ---------------------------------------------------------------------------
-# AC4 — SectorPerformance non-nullable fields
+# AC2 — SectorPerformance non-nullable fields
 # ---------------------------------------------------------------------------
 
 
@@ -170,7 +257,7 @@ def test_sector_performance_change_pct_required():
 
 
 # ---------------------------------------------------------------------------
-# AC4 — TrendItem non-nullable fields
+# AC2 — TrendItem non-nullable fields
 # ---------------------------------------------------------------------------
 
 
@@ -188,7 +275,7 @@ def test_trend_item_rank_required():
 
 
 # ---------------------------------------------------------------------------
-# AC4 — AISummary non-nullable fields
+# AC2 — AISummary non-nullable fields
 # ---------------------------------------------------------------------------
 
 
@@ -200,7 +287,7 @@ def test_ai_summary_non_nullable_string_fields(field):
 
 
 # ---------------------------------------------------------------------------
-# AC4 — MarketOverview non-nullable fields
+# AC2 — MarketOverview non-nullable fields
 # ---------------------------------------------------------------------------
 
 

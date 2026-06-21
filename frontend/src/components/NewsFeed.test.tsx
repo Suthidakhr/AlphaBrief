@@ -4,20 +4,22 @@ import NewsFeed from './NewsFeed'
 import { NewsItem } from '@/types'
 
 const makeNews = (overrides: Partial<NewsItem> & { id: string; category: string }): NewsItem => ({
-  title: `News ${overrides.id}`,
+  headline: `News ${overrides.id}`,
   summary: 'Summary text',
+  source_url: 'https://example.com/article',
+  content: 'Article content.',
   published_at: '2026-06-21T01:15:00Z',
   source: 'Reuters',
-  ai_analysis: 'Analysis',
+  ai_analysis: null,
   stock_impacts: [],
   featured: false,
   ...overrides,
 })
 
 const NEWS: NewsItem[] = [
-  makeNews({ id: 'n1', category: 'พลังงาน', title: 'Energy news' }),
-  makeNews({ id: 'n2', category: 'เทคโนโลยี', title: 'Tech news' }),
-  makeNews({ id: 'n3', category: 'พลังงาน', title: 'Another energy news' }),
+  makeNews({ id: 'n1', category: 'พลังงาน', headline: 'Energy news' }),
+  makeNews({ id: 'n2', category: 'เทคโนโลยี', headline: 'Tech news' }),
+  makeNews({ id: 'n3', category: 'พลังงาน', headline: 'Another energy news' }),
 ]
 
 describe('NewsFeed', () => {
@@ -55,11 +57,9 @@ describe('NewsFeed', () => {
 
   it('shows empty message when selected category has no matches', async () => {
     const user = userEvent.setup()
-    const noMatch: NewsItem[] = [makeNews({ id: 'x', category: 'หุ้นไทย', title: 'SET news' })]
+    const noMatch: NewsItem[] = [makeNews({ id: 'x', category: 'หุ้นไทย', headline: 'SET news' })]
     render(<NewsFeed news={noMatch} />)
     await user.click(screen.getByRole('button', { name: 'ทั้งหมด' }))
-    // ทั้งหมด shows only หุ้นไทย category data — trigger by switching to a non-existent filter is not applicable here
-    // Instead verify the empty state appears when filtered list is empty by checking the initial state
     expect(screen.getByText('SET news')).toBeInTheDocument()
   })
 

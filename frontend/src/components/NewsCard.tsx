@@ -36,7 +36,7 @@ export default function NewsCard({ news }: Props) {
 
       <div className="px-5 pt-3 pb-4">
         <h2 className="text-[15px] font-bold leading-snug mb-2" style={{ color: "#4A342A" }}>
-          {news.title}
+          {news.headline}
         </h2>
         <p className="text-sm leading-relaxed mb-4 line-clamp-2" style={{ color: "#78716c" }}>
           {news.summary}
@@ -53,7 +53,7 @@ export default function NewsCard({ news }: Props) {
             </div>
           </div>
           <p className="text-[13px] leading-relaxed" style={{ color: "#7D5A44" }}>
-            {news.ai_analysis}
+            {news.ai_analysis?.summary ?? "Analysis pending"}
           </p>
         </div>
 

@@ -4,14 +4,24 @@ export interface StockImpact {
   reason?: string;
 }
 
+export interface AIAnalysis {
+  summary: string;
+  affected_sectors: string[];
+  affected_stocks: string[];
+  sentiment: "bullish" | "bearish" | "neutral";
+  analysis_at: string;
+}
+
 export interface NewsItem {
   id: string;
-  title: string;
+  headline: string;
   summary: string;
-  category: string;
+  source_url: string;
+  content: string;
+  category: "ดอกเบี้ยโลก" | "พลังงาน" | "หุ้นไทย" | "เทคโนโลยี" | "ตลาดโลก";
   published_at: string;
   source: string;
-  ai_analysis: string;
+  ai_analysis: AIAnalysis | null;
   stock_impacts: StockImpact[];
   featured: boolean;
 }

@@ -4,12 +4,20 @@ import { NewsItem } from '@/types'
 
 const VALID_NEWS: NewsItem = {
   id: 'news-001',
-  title: 'เฟดส่งสัญญาณลดดอกเบี้ย',
+  headline: 'เฟดส่งสัญญาณลดดอกเบี้ย',
   summary: 'ธนาคารกลางสหรัฐฯ แสดงสัญญาณลดดอกเบี้ย 2 ครั้งในปีนี้',
+  source_url: 'https://bloomberg.com/test-article',
+  content: 'Full article content for testing.',
   category: 'ดอกเบี้ยโลก',
   published_at: '2026-06-21T01:15:00Z',
   source: 'Bloomberg',
-  ai_analysis: 'สัญญาณบวกที่ชัดเจน',
+  ai_analysis: {
+    summary: 'สัญญาณบวกที่ชัดเจน',
+    affected_sectors: ['อสังหาฯ'],
+    affected_stocks: ['SPALI'],
+    sentiment: 'bullish',
+    analysis_at: '2026-06-21T01:30:00Z',
+  },
   stock_impacts: [
     { symbol: 'SPALI', direction: 'positive' },
     { symbol: 'KBANK', direction: 'neutral' },
@@ -34,9 +42,14 @@ describe('NewsCard', () => {
     expect(screen.getByText('RATES')).toBeInTheDocument()
   })
 
-  it('renders ai_analysis text', () => {
+  it('renders ai_analysis summary text', () => {
     render(<NewsCard news={VALID_NEWS} />)
     expect(screen.getByText('สัญญาณบวกที่ชัดเจน')).toBeInTheDocument()
+  })
+
+  it('renders "Analysis pending" when ai_analysis is null', () => {
+    render(<NewsCard news={{ ...VALID_NEWS, ai_analysis: null }} />)
+    expect(screen.getByText('Analysis pending')).toBeInTheDocument()
   })
 
   it('renders positive stock impact badge with ▲ arrow', () => {
@@ -71,7 +84,7 @@ describe('NewsCard', () => {
   })
 
   it('unknown category falls back gracefully', () => {
-    render(<NewsCard news={{ ...VALID_NEWS, category: 'อื่นๆ' }} />)
+    render(<NewsCard news={{ ...VALID_NEWS, category: 'อื่นๆ' as never }} />)
     expect(screen.getByText('อื่นๆ')).toBeInTheDocument()
   })
 })

@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict
 
@@ -8,19 +8,31 @@ class StockImpact(BaseModel):
 
     symbol: str
     direction: Literal["positive", "negative", "neutral"]
-    reason: Optional[str] = None
+    reason: str | None = None
+
+
+class AIAnalysis(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    summary: str
+    affected_sectors: list[str]
+    affected_stocks: list[str]
+    sentiment: Literal["bullish", "bearish", "neutral"]
+    analysis_at: AwareDatetime
 
 
 class NewsItem(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
-    title: str
+    headline: str
     summary: str
-    category: str
+    source_url: str
+    content: str
+    category: Literal["ดอกเบี้ยโลก", "พลังงาน", "หุ้นไทย", "เทคโนโลยี", "ตลาดโลก"]
     published_at: AwareDatetime
     source: str
-    ai_analysis: str
+    ai_analysis: AIAnalysis | None = None
     stock_impacts: list[StockImpact]
     featured: bool = False
 

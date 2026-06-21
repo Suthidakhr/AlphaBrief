@@ -16,7 +16,7 @@ async def test_get_news_returns_list(client):
 async def test_get_news_items_have_required_fields(client):
     response = await client.get("/news/")
     items = response.json()
-    required_fields = {"id", "title", "summary", "category", "published_at", "source", "ai_analysis", "stock_impacts"}
+    required_fields = {"id", "headline", "summary", "source_url", "content", "category", "published_at", "source", "ai_analysis", "stock_impacts"}
     for item in items:
         assert required_fields.issubset(item.keys()), f"Missing fields in item: {item.get('id')}"
 
@@ -24,7 +24,7 @@ async def test_get_news_items_have_required_fields(client):
 async def test_get_news_no_null_non_nullable_fields(client):
     response = await client.get("/news/")
     items = response.json()
-    non_nullable = ["id", "title", "summary", "category", "published_at", "source", "ai_analysis"]
+    non_nullable = ["id", "headline", "summary", "source_url", "content", "category", "published_at", "source"]
     for item in items:
         for field in non_nullable:
             assert item[field] is not None, f"Null value for {field} in item {item.get('id')}"
