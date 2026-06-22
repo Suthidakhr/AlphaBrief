@@ -136,7 +136,7 @@ export default async function HomePage() {
               </div>
               <a
                 href="/news"
-                className="text-xs font-bold tracking-widest uppercase hover:underline"
+                className="text-xs font-bold tracking-widest uppercase hover:underline focus:outline-none focus-visible:shadow-[0_0_0_2px_#ffffff,0_0_0_4px_#4A342A]"
                 style={{ color: "#B2967D" }}
               >
                 View All →

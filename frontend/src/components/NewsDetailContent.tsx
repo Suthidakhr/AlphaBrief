@@ -67,7 +67,7 @@ export default function NewsDetailContent({ news }: Props) {
             href={news.source_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium hover:underline flex items-center gap-1"
+            className="font-medium hover:underline flex items-center gap-1 focus:outline-none focus-visible:shadow-[0_0_0_2px_#ffffff,0_0_0_4px_#4A342A]"
             style={{ color: "#4A342A" }}
           >
             {news.source}

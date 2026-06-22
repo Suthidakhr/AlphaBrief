@@ -45,6 +45,11 @@
 - **D6: Coverage thresholds: only lines:80 enforced** — `branches`, `functions`, and `statements` thresholds are not configured. For a financial data app where conditional rendering (null analysis, featured flag, direction badges) is core behavior, branch coverage is more meaningful. Upgrade thresholds when the component suite is stable.
 - **D7: Vitest alias manually duplicated from tsconfig** — `vitest.config.ts` manually mirrors the `@/*` alias from `tsconfig.json`. Consider adding `vite-tsconfig-paths` as a devDependency to auto-sync, eliminating the drift risk.
 
+## Deferred from: code review of 2-9-about-disclaimer-page-and-wcag-accessibility-audit (2026-06-22)
+
+- **D15: `prefers-reduced-motion` rule doesn't suppress CSS `animation:` properties** — `globals.css` media query uses `transition-duration: 0.01ms` which only affects CSS `transition:` properties; `.ticker-animate`, `.live-dot`, and Tailwind `animate-pulse` all use CSS `animation:` and remain active at full speed for users with `prefers-reduced-motion: reduce`. AC3 spec text claimed coverage of "skeleton pulse" which is inaccurate. Fix: also add `animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;` to the media query. `frontend/src/app/globals.css`
+- **D16: Footer JSX duplicated 5× across pages without a shared `<PageFooter />` component** — Identical footer HTML appears in `app/page.tsx`, `app/news/page.tsx`, `app/news/[id]/page.tsx`, `app/news/[id]/not-found.tsx`, `app/about/page.tsx`. Pre-existing in first two before this story. Extract to a `PageFooter` server component in a future cleanup story.
+
 ## Deferred from: code review of 2-8-home-page-layout-and-isr-configuration (2026-06-22)
 
 - **D13: Duplicate non-functional search inputs on home page** — `page.tsx` renders a decorative `<input type="text" aria-label="Search news, stocks, sectors">` (line 106) inside `<main>`, while `NewsFeed` (rendered inside `<HomeFeedServer>`) renders its own `<input type="search">`. Two near-identical inert search controls appear on the home page; screen readers announce both. Pre-existing in old `page.tsx` before Story 2.8. Address in a dedicated search feature story or Story 2.9 WCAG audit. `frontend/src/app/page.tsx:106 + frontend/src/components/NewsFeed.tsx:38`

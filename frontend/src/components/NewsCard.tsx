@@ -45,14 +45,14 @@ export default function NewsCard({ news }: Props) {
 
   return (
     <article
-      className="bg-white rounded-xl overflow-hidden hover:shadow-md transition-shadow duration-200 cursor-pointer"
+      className="bg-white rounded-xl overflow-hidden hover:shadow-md transition-shadow duration-200 cursor-pointer focus-within:shadow-[0_0_0_2px_#ffffff,0_0_0_4px_#4A342A]"
       style={{
         border: "1px solid rgba(74,52,42,0.1)",
         borderLeft: news.featured ? "3px solid #B2967D" : undefined,
         borderLeftColor: news.featured ? "#B2967D" : undefined,
       }}
     >
-      <Link href={`/news/${news.id}`} className="block px-5 py-4">
+      <Link href={`/news/${news.id}`} className="block px-5 py-4 focus:outline-none">
         {/* Row 1: headline + SentimentBadge */}
         <div className="flex items-start gap-2 mb-3">
           <h2 className="text-[15px] font-bold leading-snug flex-1" style={{ color: "#4A342A" }}>

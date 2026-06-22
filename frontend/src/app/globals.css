@@ -33,6 +33,12 @@ body {
   animation: pulse-dot 2s ease-in-out infinite;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
 @layer utilities {
   .pb-tab-safe {
     padding-bottom: 3.5rem;

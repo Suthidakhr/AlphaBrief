@@ -39,7 +39,7 @@ export default function NewsFeed({ news, last_updated, activeCategory, error }: 
         type="search"
         aria-label="Search news, stocks, and sectors"
         placeholder="Search news, stocks, and sectors"
-        className="w-full px-4 py-2 rounded-lg border text-sm mb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A342A] focus-visible:ring-offset-2"
+        className="w-full px-4 py-2 rounded-lg border text-sm mb-4 focus:outline-none focus-visible:shadow-[0_0_0_2px_#ffffff,0_0_0_4px_#4A342A]"
         style={{ borderColor: "rgba(74,52,42,0.2)", color: "#4A342A" }}
       />
 

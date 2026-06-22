@@ -18,7 +18,7 @@ describe('BottomTabBar', () => {
     render(<BottomTabBar />)
     expect(screen.getByText('Overview')).toBeInTheDocument()
     expect(screen.getByText('News')).toBeInTheDocument()
-    expect(screen.getByText('Stocks')).toBeInTheDocument()
+    expect(screen.getByText('About')).toBeInTheDocument()
     expect(screen.getByText('Trends')).toBeInTheDocument()
   })
 
@@ -31,16 +31,16 @@ describe('BottomTabBar', () => {
   it('inactive tabs (pathname /) have reduced opacity color', () => {
     render(<BottomTabBar />)
     const newsLink = screen.getByText('News').closest('a')
-    const stocksLink = screen.getByText('Stocks').closest('a')
+    const aboutLink = screen.getByText('About').closest('a')
     const trendsLink = screen.getByText('Trends').closest('a')
     expect(newsLink).toHaveStyle({ color: 'rgba(255,255,255,0.45)' })
-    expect(stocksLink).toHaveStyle({ color: 'rgba(255,255,255,0.45)' })
+    expect(aboutLink).toHaveStyle({ color: 'rgba(255,255,255,0.45)' })
     expect(trendsLink).toHaveStyle({ color: 'rgba(255,255,255,0.45)' })
   })
 
   it('Thai sub-labels have aria-hidden="true"', () => {
     render(<BottomTabBar />)
-    const thaiLabels = screen.getAllByText(/ภาพรวม|ข่าว|หุ้น|แนวโน้ม/)
+    const thaiLabels = screen.getAllByText(/ภาพรวม|ข่าว|เกี่ยวกับ|แนวโน้ม/)
     thaiLabels.forEach((el) => {
       expect(el).toHaveAttribute('aria-hidden', 'true')
     })
@@ -50,7 +50,7 @@ describe('BottomTabBar', () => {
     render(<BottomTabBar />)
     expect(screen.getByText('Overview').closest('a')).toHaveAttribute('href', '/')
     expect(screen.getByText('News').closest('a')).toHaveAttribute('href', '/news')
-    expect(screen.getByText('Stocks').closest('a')).toHaveAttribute('href', '/stocks')
+    expect(screen.getByText('About').closest('a')).toHaveAttribute('href', '/about')
     expect(screen.getByText('Trends').closest('a')).toHaveAttribute('href', '/trends')
   })
 

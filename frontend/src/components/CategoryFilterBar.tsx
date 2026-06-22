@@ -55,7 +55,7 @@ export default function CategoryFilterBar({ categories, activeSlug }: Props) {
             aria-selected={isActive}
             onClick={() => handleSelect(cat.slug)}
             onKeyDown={(e) => handleKeyDown(e, i)}
-            className="flex-shrink-0 min-h-[44px] px-4 py-2 rounded-full text-sm font-medium border transition-colors"
+            className="flex-shrink-0 min-h-[44px] px-4 py-2 rounded-full text-sm font-medium border transition-colors focus:outline-none focus-visible:shadow-[0_0_0_2px_#ffffff,0_0_0_4px_#4A342A]"
             style={
               isActive
                 ? {
