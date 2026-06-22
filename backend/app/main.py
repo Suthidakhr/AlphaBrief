@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import news, market, trends, webhooks
+from app.routers import daily_brief, news, market, trends, webhooks
 
 app = FastAPI(
     title="ASK API",
@@ -20,6 +20,7 @@ app.include_router(news.router)
 app.include_router(market.router)
 app.include_router(trends.router)
 app.include_router(webhooks.router)
+app.include_router(daily_brief.router)
 
 
 @app.get("/")

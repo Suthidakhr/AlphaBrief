@@ -78,3 +78,13 @@ export interface TickerItem {
   change: number;
   change_pct: number;
 }
+
+export interface DailyBrief {
+  overall_sentiment: "bullish" | "bearish" | "neutral";
+  key_developments: string[];
+  opportunities: string[];
+  risks: string[];
+  generated_at: string;
+  brief_date: string;
+  is_fallback: boolean;
+}

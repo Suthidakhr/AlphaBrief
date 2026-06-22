@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Literal
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, field_validator
@@ -139,3 +140,15 @@ class AIAnalysisResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     status: Literal["attached", "updated"]
+
+
+class DailyBrief(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    overall_sentiment: Literal["bullish", "bearish", "neutral"]
+    key_developments: list[str]
+    opportunities: list[str]
+    risks: list[str]
+    generated_at: AwareDatetime
+    brief_date: date
+    is_fallback: bool

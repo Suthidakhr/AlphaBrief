@@ -1,5 +1,11 @@
 # Deferred Work Log
 
+## Deferred from: code review of 4-1-daily-brief-schema-and-api-endpoint (2026-06-22)
+
+- **D1: `DailyBriefStore` is a module-level singleton — no cross-process state sharing** — In any multi-process deployment (Gunicorn, `uvicorn --workers N`), each worker has its own isolated in-memory store. A brief upserted in worker A is invisible to worker B. Matches pre-existing architectural limitation of `NewsStore` and all other in-memory stores. Acceptable for single-worker deployments; requires a shared backend (Redis, DB) for multi-worker. `backend/app/services/daily_brief_store.py`
+- **D2: `BKK_TZ` constant duplicated in router and test file** — Both `backend/app/routers/daily_brief.py:8` and `backend/tests/routers/test_daily_brief.py:8` define `BKK_TZ = timezone(timedelta(hours=7))`. No practical risk (Thailand has no DST and UTC+7 has been stable), but if one is edited without the other, tests could diverge from production behavior. Consolidate into a shared constants module in a later refactor.
+- **D3: No eviction of old `brief_date` keys from `_briefs` dict** — `DailyBriefStore._briefs` grows by at most 1 entry per day. At 365 entries/year, memory impact is negligible. Consistent with `NewsStore` (also unbounded). Add date-range pruning if the service runs for years without restart. `backend/app/services/daily_brief_store.py`
+
 ## Deferred from: code review of 3-4-n8n-workflow-configuration-and-pipeline-validation (2026-06-22)
 
 - **D1: Automated script continues after Step 2 failure** — `fail()` returns exit 0; `set -e` does not abort. Step 3 runs for 5 minutes even when Step 2 already failed. The root-cause signal is diluted and the operator waits unnecessarily. Fix: add `&& exit 1` to the `fail "Article not in GET /news..."` call, or restructure with explicit `exit` after Step 2 failure. `docs/e2e-validation.md` automated script.
