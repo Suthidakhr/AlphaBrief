@@ -1,5 +1,11 @@
 # Deferred Work Log
 
+## Deferred from: code review of 3-3-ai-system-prompt-version-controlled-constraints (2026-06-22)
+
+- **D1: `test_prompt_file_exists` is redundant** — `from app.ai import prompts` at module level raises `ModuleNotFoundError` before `test_prompt_file_exists` is ever executed if `prompts.py` is deleted. The test provides no independent guard. Harmless today; consider replacing with `importlib.util.find_spec("app.ai.prompts")` pattern if file-existence independence matters. `backend/tests/ai/test_system_prompt.py:8`
+- **D2: Substring assertions catch deletion but not dilution** — `"price prediction" in SYSTEM_PROMPT.lower()` fails if the constraint phrase is deleted, but passes if the constraint is weakened while keeping those words (e.g., "Claude excels at price prediction tasks but here we avoid it"). Acceptable for MVP; could be hardened by asserting the full constraint sentence. `backend/tests/ai/test_system_prompt.py:13,18`
+- **D3: Second prompt constant bypasses all tests** — Tests are bound to `prompts.SYSTEM_PROMPT` by name. A developer adding `ANALYSIS_PROMPT` or `BRIEF_PROMPT` without the required constraints would pass all tests. Add an inventory test or use a naming convention registry when additional prompts are added. `backend/app/ai/prompts.py`
+
 ## Deferred from: code review of 3-2-ai-analysis-delivery-webhook-endpoint (2026-06-22)
 
 - **D1: Module-level timestamps evaluated once at import** — `datetime.now(timezone.utc).isoformat()` in `NEWS_INGEST_PAYLOAD` and `VALID_ANALYSIS` is evaluated at module import, not per-test. Harmless for normal CI runs (7-day retention window); becomes a risk if tests run near a retention boundary or `NEWS_RETENTION_DAYS` is very small. Antipattern worth addressing when timestamps are used in list-endpoint assertions. `backend/tests/routers/test_webhooks_ai_analysis.py:10,23`
