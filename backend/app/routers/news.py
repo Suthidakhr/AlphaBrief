@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, HTTPException, Query
 from app.models.schemas import NewsCategory, NewsItem, NewsListResponse
 from app.services.mock_data import NEWS_DATA
+from app.services.news_store import news_store
 
 router = APIRouter(prefix="/news", tags=["news"])
 
@@ -20,7 +21,7 @@ async def get_news(
     limit: int = Query(20, ge=1, le=50),
 ):
     cutoff = datetime.now(timezone.utc) - timedelta(days=NEWS_RETENTION_DAYS)
-    data = [n for n in NEWS_DATA if n["published_at"] >= cutoff]
+    data = [n for n in news_store.get_all() if n["published_at"] >= cutoff]
 
     if category:
         data = [n for n in data if n["category"] == category]
@@ -39,7 +40,7 @@ async def get_categories():
 
 @router.get("/{news_id}", response_model=NewsItem)
 async def get_news_by_id(news_id: str):
-    for item in NEWS_DATA:
-        if item["id"] == news_id:
-            return item
-    raise HTTPException(status_code=404, detail="News not found")
+    item = news_store.get_by_id(news_id)
+    if item is None:
+        raise HTTPException(status_code=404, detail="News not found")
+    return item

@@ -1,5 +1,17 @@
 # Deferred Work Log
 
+## Deferred from: code review of 3-1-news-ingestion-webhook-endpoint (2026-06-22)
+
+- **D1: No authentication on webhook endpoint** — POST /webhooks/news-ingest has no auth header, API key, or shared secret. Any caller can inject content. Intentional MVP decision for internal n8n integration; address in a future security hardening story. `backend/app/routers/webhooks.py:8`
+- **D2: In-memory store — data lost on process restart** — All ingested items are lost when the process restarts. Intentional MVP design; persistence (database or queue) is a future epic concern. `backend/app/services/news_store.py`
+- **D3: threading.Lock ineffective across multiple worker processes** — Multi-worker deployments (Gunicorn/Uvicorn) each have their own NewsStore instance; duplicate checks are not cross-process safe. Acceptable at MVP single-worker scale; address when adding persistence. `backend/app/services/news_store.py:7`
+- **D4: get_by_id O(n) linear scan — no ID index** — No _id_index; GET /news/{id} scans all items. Acceptable at MVP scale; add id index alongside persistence work. `backend/app/services/news_store.py:23-27`
+- **D5: get_all shallow-copies list but not dict items** — list(self._items) creates a new list but shares dict references; callers could mutate items. FastAPI serializes immediately so no current exploitable path. Address with typed store objects when adding persistence. `backend/app/services/news_store.py:19-21`
+- **D6: AC3 content-hash dedup doesn't index second source_url** — When content-hash dedup fires, the new URL is not added to _url_index. Dedup is still correct (future same-URL request hits content-hash path). Minor gap in future extensibility. `backend/app/services/news_store.py:34-37`
+- **D7: KeyError if mock data items lack source_url or content** — __init__ dict comprehensions would raise KeyError on malformed mock data. Controlled internal data makes this impossible in practice. `backend/app/services/news_store.py:9-12`
+- **D8: No rate limiting on ingest endpoint** — No throttling per caller or time window. Infrastructure-level concern outside MVP scope. `backend/app/routers/webhooks.py`
+- **D9: ingest() accepts plain dict — type safety lost at store boundary** — Pydantic validates at the router boundary; store works with untyped dicts internally. Acceptable for MVP; address when introducing typed domain models with persistence. `backend/app/services/news_store.py:32`
+
 ## Deferred from: code review of 2-6-news-feed-page-and-category-filter-bar (2026-06-22)
 
 - **D1: formatTime(error) invalid date risk** — `error: string | null` prop passed to `formatTime()` has no ISO date type constraint; a future caller passing a non-ISO string (e.g. an error message) would render "Invalid Date" in the error banner. Enforce with a branded type or rename the prop to `errorTimestamp`. `NewsFeed.tsx:70`

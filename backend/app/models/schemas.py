@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, field_validator
 
 NewsCategory = Literal["ดอกเบี้ยโลก", "พลังงาน", "หุ้นไทย", "เทคโนโลยี", "ตลาดโลก"]
 
@@ -95,3 +95,30 @@ class MarketOverview(BaseModel):
     ai_summary: AISummary
     last_updated: str
     news_count: int
+
+
+class NewsIngestPayload(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    headline: str = Field(..., min_length=1)
+    source: str = Field(..., min_length=1)
+    source_url: str
+    published_at: AwareDatetime
+    category: NewsCategory
+    content: str = Field(..., min_length=1)
+    summary: str = ""
+    featured: bool = False
+
+    @field_validator("source_url")
+    @classmethod
+    def validate_source_url(cls, v: str) -> str:
+        if not (v.startswith("http://") or v.startswith("https://")):
+            raise ValueError("source_url must be a valid HTTP or HTTPS URL")
+        return v
+
+
+class WebhookIngestResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    event_id: str
+    status: Literal["created", "duplicate"]
