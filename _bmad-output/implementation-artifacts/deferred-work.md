@@ -1,5 +1,9 @@
 # Deferred Work Log
 
+## Deferred from: code review of 4-2-dailybriefcard-component (2026-06-22)
+
+- **D1: `DailyBriefCardError` timestamp may appear stale under ISR caching** — `new Date().toISOString()` in `DailyBriefCardError` records the server render time. Under Next.js ISR caching, the cached page may be served hours after the render, making "Last attempted [HH:MM]" misleading. Story 4.4 (home page integration) should either revalidate frequently or move the error timestamp to a client component. `frontend/src/components/DailyBriefCard.tsx:162`
+
 ## Deferred from: code review of 4-1-daily-brief-schema-and-api-endpoint (2026-06-22)
 
 - **D1: `DailyBriefStore` is a module-level singleton — no cross-process state sharing** — In any multi-process deployment (Gunicorn, `uvicorn --workers N`), each worker has its own isolated in-memory store. A brief upserted in worker A is invisible to worker B. Matches pre-existing architectural limitation of `NewsStore` and all other in-memory stores. Acceptable for single-worker deployments; requires a shared backend (Redis, DB) for multi-worker. `backend/app/services/daily_brief_store.py`
