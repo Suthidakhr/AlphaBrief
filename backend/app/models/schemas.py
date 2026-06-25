@@ -152,3 +152,20 @@ class DailyBrief(BaseModel):
     generated_at: AwareDatetime
     brief_date: date
     is_fallback: bool
+
+
+class DailyBriefIngestPayload(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    overall_sentiment: Literal["bullish", "bearish", "neutral"]
+    key_developments: list[str]
+    opportunities: list[str]
+    risks: list[str]
+    generated_at: AwareDatetime
+    brief_date: date
+
+
+class DailyBriefWebhookResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    status: Literal["created", "updated"]

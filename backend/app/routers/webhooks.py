@@ -2,9 +2,12 @@ from fastapi import APIRouter, HTTPException
 from app.models.schemas import (
     AIAnalysisPayload,
     AIAnalysisResponse,
+    DailyBriefIngestPayload,
+    DailyBriefWebhookResponse,
     NewsIngestPayload,
     WebhookIngestResponse,
 )
+from app.services.daily_brief_store import daily_brief_store
 from app.services.news_store import news_store
 
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
@@ -24,3 +27,9 @@ async def attach_ai_analysis(payload: AIAnalysisPayload) -> AIAnalysisResponse:
     if result is None:
         raise HTTPException(status_code=404, detail="News item not found")
     return AIAnalysisResponse(status=result)
+
+
+@router.post("/daily-brief", response_model=DailyBriefWebhookResponse)
+async def ingest_daily_brief(payload: DailyBriefIngestPayload) -> DailyBriefWebhookResponse:
+    status = daily_brief_store.upsert(payload.model_dump())
+    return DailyBriefWebhookResponse(status=status)

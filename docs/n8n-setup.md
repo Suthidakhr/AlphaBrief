@@ -8,14 +8,15 @@ This guide covers how to configure n8n to drive the ASK (Aware Signals & Knowled
 
 ## Overview
 
-Two n8n workflows power the live data pipeline:
+Three n8n workflows power the live data pipeline:
 
 | Workflow | Purpose | Trigger |
 |---------|---------|---------|
 | **News Ingestion** | Fetches articles from sources, POSTs each to `/webhooks/news-ingest` | Schedule (cron) |
 | **AI Analysis** | Calls Claude API with `SYSTEM_PROMPT`, POSTs result to `/webhooks/ai-analysis` | Triggered per article after ingestion |
+| **Daily Brief** | Generates AI market summary, POSTs to `/webhooks/daily-brief` | Daily at 07:00 Bangkok time |
 
-Both workflows use environment variables for all webhook URLs — never hardcoded values.
+All workflows use environment variables for all webhook URLs — never hardcoded values.
 
 ---
 
@@ -27,6 +28,7 @@ Configure these in n8n's **Settings → Variables** (or your deployment's enviro
 |----------|-------------|---------|
 | `ASK_NEWS_INGEST_WEBHOOK_URL` | Full URL for `POST /webhooks/news-ingest` | `https://ask.example.com/webhooks/news-ingest` |
 | `ASK_AI_ANALYSIS_WEBHOOK_URL` | Full URL for `POST /webhooks/ai-analysis` | `https://ask.example.com/webhooks/ai-analysis` |
+| `ASK_DAILY_BRIEF_WEBHOOK_URL` | Full URL for `POST /webhooks/daily-brief` | `https://ask.example.com/webhooks/daily-brief` |
 | `ANTHROPIC_API_KEY` | Claude API key for the AI analysis node | `sk-ant-api03-...` |
 | `ASK_BASE_URL` | Base URL used for polling in E2E validation | `https://ask.example.com` |
 
@@ -190,13 +192,79 @@ Commit exported workflow JSON files to the repo alongside code. This allows roll
 
 ## Rotating Webhook URLs (No Code Deploy Required)
 
-The ASK webhook endpoints use stable URL paths (`/webhooks/news-ingest`, `/webhooks/ai-analysis`) — there are no UUID tokens in the paths. URL rotation means changing the base domain or path prefix:
+The ASK webhook endpoints use stable URL paths (`/webhooks/news-ingest`, `/webhooks/ai-analysis`, `/webhooks/daily-brief`) — there are no UUID tokens in the paths. URL rotation means changing the base domain or path prefix:
 
-1. Update `ASK_NEWS_INGEST_WEBHOOK_URL` and/or `ASK_AI_ANALYSIS_WEBHOOK_URL` in n8n's environment variables
+1. Update `ASK_NEWS_INGEST_WEBHOOK_URL`, `ASK_AI_ANALYSIS_WEBHOOK_URL`, and/or `ASK_DAILY_BRIEF_WEBHOOK_URL` in n8n's environment variables
 2. Save the variable — n8n picks up the new value on the next workflow execution
 3. No FastAPI code deploy, no workflow JSON change, no restart required
 
 If you use a reverse proxy or API gateway in front of FastAPI with token-based routing, update the gateway route and then update the n8n env var to the new URL.
+
+---
+
+## Workflow 3: Daily Brief
+
+Generates the AI market summary once per day and pushes it to ASK before users open the app.
+
+**Reference requirements:** FR-D04 (daily brief available by 07:00 Bangkok time), NFR-D03 (timezone-aware datetime required).
+
+### Schedule Configuration (FR-D04)
+
+Bangkok time is UTC+7. The cron expression below is in **UTC**.
+
+```
+0 0 * * *
+```
+
+This fires at 00:00 UTC = 07:00 Bangkok time, every day including weekends.
+
+**n8n version note:** For 6-field cron (with seconds prefix): `0 0 0 * * *`
+
+### Trigger Node
+
+- **Type:** Schedule Trigger
+- **Cron:** `0 0 * * *` (UTC) — or use "At a specific time" set to 00:00 UTC
+- **Timezone:** Set to UTC (not Bangkok — the cron expression already accounts for the offset)
+
+### AI Generation Node
+
+Configure an HTTP Request node calling the Claude API. Instruct the model to return JSON matching the `DailyBriefIngestPayload` schema:
+
+```json
+{
+  "overall_sentiment": "bullish",
+  "key_developments": ["string", "string", "string"],
+  "opportunities": ["string"],
+  "risks": ["string"],
+  "generated_at": "2026-06-22T00:05:00Z",
+  "brief_date": "2026-06-22"
+}
+```
+
+**Important:** `is_fallback` is **not** part of the payload — the ASK backend computes it at read time. Do not include it.
+
+- `generated_at` must be timezone-aware (include `Z` or `+00:00`). Naive datetimes return `422`.
+- `brief_date` is the Bangkok calendar date (YYYY-MM-DD). Use the Bangkok date at trigger time: trigger fires at 00:00 UTC = 07:00 BKK, so use today's Bangkok date.
+- `overall_sentiment` must be exactly `"bullish"`, `"bearish"`, or `"neutral"`. Any other value returns `422`.
+
+### Webhook Delivery Node
+
+- **Method:** POST
+- **URL:** `{{ $env.ASK_DAILY_BRIEF_WEBHOOK_URL }}`
+- **Content-Type:** `application/json`
+- **Body:** Parsed JSON from the AI generation node
+
+**Success responses:**
+- `{"status": "created"}` — first brief for this date
+- `{"status": "updated"}` — brief updated (n8n retry or re-generation)
+
+Both are treated as success — n8n should not retry on either.
+
+### Error Handling
+
+- **On AI generation failure:** n8n logs the error. The GET endpoint serves yesterday's brief as fallback (`is_fallback: true`) until today's brief arrives.
+- **On webhook 422:** Fix the AI prompt. The endpoint enforces the schema contract at the boundary — check `overall_sentiment`, `generated_at` timezone, and required fields.
+- **On webhook delivery failure:** n8n retries automatically. The endpoint is idempotent — retries for the same `brief_date` return `{"status": "updated"}` and never duplicate data.
 
 ---
 
