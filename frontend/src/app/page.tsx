@@ -7,7 +7,8 @@ import NewsFeed from "@/components/NewsFeed";
 import MarketOverviewWidget from "@/components/MarketOverviewWidget";
 import SectorHeatmap from "@/components/SectorHeatmap";
 import TrendSummary from "@/components/TrendSummary";
-import DailyBriefPlaceholder from "@/components/DailyBriefPlaceholder";
+import DailyBriefServer from "@/components/DailyBriefServer";
+import { DailyBriefCardSkeleton } from "@/components/DailyBriefCard";
 import SkeletonCard from "@/components/SkeletonCard";
 
 async function HomeFeedServer() {
@@ -119,8 +120,19 @@ export default async function HomePage() {
         {/* Two-column content grid */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-5 items-start">
 
-          {/* Left: news feed */}
-          <div>
+          {/* Right: sidebar — first in DOM so DailyBriefCard appears above news feed on mobile */}
+          {/* lg:order-last restores right-column placement on desktop */}
+          <div className="space-y-4 order-first lg:order-last">
+            <Suspense fallback={<DailyBriefCardSkeleton />}>
+              <DailyBriefServer />
+            </Suspense>
+            <Suspense fallback={<SkeletonCard />}>
+              <MarketSidebarServer />
+            </Suspense>
+          </div>
+
+          {/* Left: news feed — second in DOM on mobile, restored to left column on desktop */}
+          <div className="order-last lg:order-first">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <div
@@ -144,14 +156,6 @@ export default async function HomePage() {
             </div>
             <Suspense fallback={<SkeletonCard />}>
               <HomeFeedServer />
-            </Suspense>
-          </div>
-
-          {/* Right: sidebar */}
-          <div className="space-y-4">
-            <DailyBriefPlaceholder />
-            <Suspense fallback={<SkeletonCard />}>
-              <MarketSidebarServer />
             </Suspense>
           </div>
         </div>
