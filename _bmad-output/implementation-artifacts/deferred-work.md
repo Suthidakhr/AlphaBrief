@@ -1,5 +1,14 @@
 # Deferred Work Log
 
+## Deferred from: code review of 5-3-theme-detail-page (2026-06-26)
+
+- **D1: `dateRange` NaN if `published_at` is invalid/empty** — `new Date(invalidStr).getTime()` returns NaN; `Math.min(NaN, ...)` propagates NaN → "Invalid Date" in UI. Deferred: `AwareDatetime` Pydantic validator at API boundary rejects non-ISO values; same unguarded pattern as `NewsCard.relativeTime()` already shipping. `frontend/src/components/ThemeDetailContent.tsx:7`
+- **D2: `article_count` vs `constituent_articles.length` divergence** — `theme.article_count` (from schema) may differ from actual array length if API has a bug; UI shows contradictory count/card numbers. Deferred: backend schema contract; Story 5.1 API guarantees these stay in sync. `frontend/src/components/ThemeDetailContent.tsx:45`
+- **D3: Locale-dependent `toLocaleDateString` may fail in CI** — `toLocaleDateString("en-US", {month:"short", ...})` requires full ICU; minimal Node builds may return "6/1/2025" instead of "Jun 1, 2025", breaking test assertions. Deferred: local tests pass; address when CI pipeline is configured. `frontend/src/components/ThemeDetailContent.test.tsx`
+- **D4: No `error.tsx` boundary for unrecognized fetch errors** — Non-404/410 errors re-thrown from `ThemeDetailServer` propagate to Next.js global error page (Navbar/footer disappear). Deferred: pre-existing gap across all pages; none have `error.tsx`. `frontend/src/app/trends/[id]/page.tsx`
+- **D5: `Math.min(...times)` stack overflow with very large article arrays** — Spread operator passes each element as a function argument; V8 limits ~65k args. Deferred: 48h archive window makes large arrays unreachable in practice. `frontend/src/components/ThemeDetailContent.tsx:8`
+- **D6: `SentimentBadge` crashes on unknown `overall_sentiment` values** — Pre-existing; `SENTIMENT_STYLES[unknown]` returns undefined, destructuring throws TypeError. Already logged from Story 5.2 review D6. `frontend/src/components/SentimentBadge.tsx:14`
+
 ## Deferred from: code review of 5-2-themecard-component-and-trends-page (2026-06-26)
 
 - **D1: Single `ThemeCardSkeleton` fallback doesn't match rendered list count** — The Suspense boundary uses one `<ThemeCardSkeleton />` as fallback regardless of how many ThemeCards will render. On slow API loads, users see one skeleton then N cards appear at once — CLS. Deferred: design choice, matching DailyBriefCard and NewsCard patterns. `frontend/src/app/trends/page.tsx:89`
