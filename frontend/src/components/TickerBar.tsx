@@ -53,25 +53,31 @@ export default function TickerBar({ snapshot }: Props) {
         </div>
       )}
       <div className="overflow-hidden flex-1 ticker-scroll-container">
-        <div className="flex ticker-animate whitespace-nowrap">
-          {doubled.map((item, i) => {
-            const pct = isFinite(item.change_pct)
-              ? `${item.change_pct >= 0 ? "+" : ""}${item.change_pct.toFixed(2)}%`
-              : "—";
-            return (
-              <span
-                key={i}
-                className="inline-flex items-center gap-2 px-6 text-sm border-r"
-                style={{ borderColor: "rgba(255,255,255,0.15)" }}
-              >
-                <span className="font-bold text-white font-mono">{item.symbol}</span>
-                <span className={DIR_COLOR[item.direction] ?? "text-white/70"}>
-                  {DIR_ARROW[item.direction] ?? "–"} {pct}
+        {snapshot.tickers.length === 0 ? (
+          <span className="px-4 text-sm" style={{ color: "rgba(255,255,255,0.55)" }}>
+            No ticker data available
+          </span>
+        ) : (
+          <div className="flex ticker-animate whitespace-nowrap">
+            {doubled.map((item, i) => {
+              const pct = isFinite(item.change_pct)
+                ? `${item.change_pct >= 0 ? "+" : ""}${item.change_pct.toFixed(2)}%`
+                : "—";
+              return (
+                <span
+                  key={i}
+                  className="inline-flex items-center gap-2 px-6 text-sm border-r"
+                  style={{ borderColor: "rgba(255,255,255,0.15)" }}
+                >
+                  <span className="font-bold text-white font-mono">{item.symbol}</span>
+                  <span className={DIR_COLOR[item.direction] ?? "text-white/70"}>
+                    {DIR_ARROW[item.direction] ?? "–"} {pct}
+                  </span>
                 </span>
-              </span>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

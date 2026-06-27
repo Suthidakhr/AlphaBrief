@@ -87,4 +87,9 @@ describe("TickerBar", () => {
       render(<TickerBar snapshot={{ ...VALID_SNAPSHOT, tickers: [] }} />)
     ).not.toThrow();
   });
+
+  it("shows No ticker data available message when tickers array is empty", () => {
+    render(<TickerBar snapshot={{ ...VALID_SNAPSHOT, tickers: [] }} />);
+    expect(screen.getByText(/No ticker data available/)).toBeInTheDocument();
+  });
 });

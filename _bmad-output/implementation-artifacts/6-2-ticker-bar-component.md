@@ -1,5 +1,5 @@
 ---
-status: review
+status: done
 epic: 6
 story: 2
 story_key: "6-2-ticker-bar-component"
@@ -9,7 +9,7 @@ baseline_commit: 816b1723a5592e446cfaa2df86ab1ed28baf1820
 
 # Story 6.2: Ticker Bar Component
 
-**Status:** ready-for-dev
+**Status:** done
 
 ## Story
 
@@ -92,6 +92,14 @@ So that I can monitor market momentum at a glance without navigating away from a
 - [x] Task 5: Validate and run all tests
   - [x] 5.1 Run `cd frontend && npx tsc --noEmit` — zero TypeScript errors
   - [x] 5.2 Run `cd frontend && npx vitest run` — 168 tests pass (7 new TickerBar tests added)
+
+### Review Findings
+
+- [x] [Review][Decision] D1: Empty tickers state undefined — resolved: option 2 chosen — render "No ticker data available" inline in scroll container when `snapshot.tickers.length === 0`; animated div suppressed. New test added. 169/169 tests pass.
+
+- [x] [Review][Defer] W1: Animation loop gap with very few tickers [TickerBar.tsx:36] — deferred, pre-existing. With 1-2 tickers `[...snapshot.tickers, ...snapshot.tickers]` may produce a div narrower than the container, causing a visible gap as the `translateX(-50%)` loop resets. Same doubling approach existed in Story 6.1.
+- [x] [Review][Defer] W2: `prefers-reduced-motion` mid-scroll freeze [globals.css:33] — deferred, pre-existing CSS limitation. `animation-play-state: paused` freezes at current scroll offset if user toggles OS preference after page load. At page-load time (typical case) animation starts paused at `translateX(0)` — items are fully visible. Runtime-toggle edge case is a known CSS limitation.
+- [x] [Review][Defer] W3: CSS hover-pause rule fragile to future nesting [globals.css:28] — deferred, pre-existing design choice. `.ticker-scroll-container:hover .ticker-animate` stops working silently if `.ticker-animate` is ever wrapped in another element. No current breakage.
 
 ---
 
