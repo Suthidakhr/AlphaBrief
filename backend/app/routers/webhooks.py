@@ -5,10 +5,13 @@ from app.models.schemas import (
     DailyBriefIngestPayload,
     DailyBriefWebhookResponse,
     NewsIngestPayload,
+    ThemeIngestPayload,
+    ThemeWebhookResponse,
     WebhookIngestResponse,
 )
 from app.services.daily_brief_store import daily_brief_store
 from app.services.news_store import news_store
+from app.services.theme_store import theme_store
 
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 
@@ -33,3 +36,12 @@ async def attach_ai_analysis(payload: AIAnalysisPayload) -> AIAnalysisResponse:
 async def ingest_daily_brief(payload: DailyBriefIngestPayload) -> DailyBriefWebhookResponse:
     status = daily_brief_store.upsert(payload.model_dump())
     return DailyBriefWebhookResponse(status=status)
+
+
+@router.post("/themes", response_model=ThemeWebhookResponse)
+async def ingest_theme(payload: ThemeIngestPayload) -> ThemeWebhookResponse:
+    for aid in payload.constituent_article_ids:
+        if news_store.get_by_id(aid) is None:
+            raise HTTPException(status_code=422, detail=f"Article not found: {aid}")
+    status = theme_store.upsert(payload.model_dump())
+    return ThemeWebhookResponse(status=status)

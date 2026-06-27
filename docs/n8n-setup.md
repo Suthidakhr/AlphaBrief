@@ -8,13 +8,14 @@ This guide covers how to configure n8n to drive the ASK (Aware Signals & Knowled
 
 ## Overview
 
-Three n8n workflows power the live data pipeline:
+Four n8n workflows power the live data pipeline:
 
 | Workflow | Purpose | Trigger |
 |---------|---------|---------|
 | **News Ingestion** | Fetches articles from sources, POSTs each to `/webhooks/news-ingest` | Schedule (cron) |
 | **AI Analysis** | Calls Claude API with `SYSTEM_PROMPT`, POSTs result to `/webhooks/ai-analysis` | Triggered per article after ingestion |
 | **Daily Brief** | Generates AI market summary, POSTs to `/webhooks/daily-brief` | Daily at 07:00 Bangkok time |
+| **Theme Clustering** | Receives AI-identified theme clusters, POSTs to `/webhooks/themes` | Daily after AI analysis batch |
 
 All workflows use environment variables for all webhook URLs — never hardcoded values.
 
@@ -29,6 +30,7 @@ Configure these in n8n's **Settings → Variables** (or your deployment's enviro
 | `ASK_NEWS_INGEST_WEBHOOK_URL` | Full URL for `POST /webhooks/news-ingest` | `https://ask.example.com/webhooks/news-ingest` |
 | `ASK_AI_ANALYSIS_WEBHOOK_URL` | Full URL for `POST /webhooks/ai-analysis` | `https://ask.example.com/webhooks/ai-analysis` |
 | `ASK_DAILY_BRIEF_WEBHOOK_URL` | Full URL for `POST /webhooks/daily-brief` | `https://ask.example.com/webhooks/daily-brief` |
+| `ASK_THEME_WEBHOOK_URL` | Full URL for `POST /webhooks/themes` | `https://ask.example.com/webhooks/themes` |
 | `ANTHROPIC_API_KEY` | Claude API key for the AI analysis node | `sk-ant-api03-...` |
 | `ASK_BASE_URL` | Base URL used for polling in E2E validation | `https://ask.example.com` |
 
@@ -194,7 +196,7 @@ Commit exported workflow JSON files to the repo alongside code. This allows roll
 
 The ASK webhook endpoints use stable URL paths (`/webhooks/news-ingest`, `/webhooks/ai-analysis`, `/webhooks/daily-brief`) — there are no UUID tokens in the paths. URL rotation means changing the base domain or path prefix:
 
-1. Update `ASK_NEWS_INGEST_WEBHOOK_URL`, `ASK_AI_ANALYSIS_WEBHOOK_URL`, and/or `ASK_DAILY_BRIEF_WEBHOOK_URL` in n8n's environment variables
+1. Update `ASK_NEWS_INGEST_WEBHOOK_URL`, `ASK_AI_ANALYSIS_WEBHOOK_URL`, `ASK_DAILY_BRIEF_WEBHOOK_URL`, and/or `ASK_THEME_WEBHOOK_URL` in n8n's environment variables
 2. Save the variable — n8n picks up the new value on the next workflow execution
 3. No FastAPI code deploy, no workflow JSON change, no restart required
 
@@ -265,6 +267,67 @@ Both are treated as success — n8n should not retry on either.
 - **On AI generation failure:** n8n logs the error. The GET endpoint serves yesterday's brief as fallback (`is_fallback: true`) until today's brief arrives.
 - **On webhook 422:** Fix the AI prompt. The endpoint enforces the schema contract at the boundary — check `overall_sentiment`, `generated_at` timezone, and required fields.
 - **On webhook delivery failure:** n8n retries automatically. The endpoint is idempotent — retries for the same `brief_date` return `{"status": "updated"}` and never duplicate data.
+
+---
+
+## Workflow 4: Theme Clustering
+
+Receives AI-identified market theme clusters from the clustering pipeline and pushes them into ASK, making them available on the Trends page.
+
+**Reference requirements:** FR-T01 (themes available each morning), NFR-D03 (timezone-aware datetime required).
+
+### Schedule Configuration
+
+Theme clustering runs once daily **after** Workflow 2 (AI Analysis) has completed processing the day's articles. Configure the trigger time to be at least 30 minutes after the last AI Analysis job typically finishes.
+
+The exact trigger time is configurable in n8n without a code deploy — change the schedule node and save.
+
+### Trigger Node
+
+- **Type:** Schedule Trigger
+- **Cron:** `0 2 * * *` (UTC) — or any time after AI analysis batch completes. Adjust as needed.
+- **Timezone:** Set to UTC
+
+### AI Theme Generation Node
+
+Configure an HTTP Request node calling the clustering AI model. It should return a payload matching `ThemeIngestPayload`:
+
+```json
+{
+  "theme_id": "theme-2026-06-26-001",
+  "name": "Fed Rate Cut Sentiment",
+  "description": "Markets anticipate rate cuts following softer CPI data published this week.",
+  "overall_sentiment": "bullish",
+  "article_count": 3,
+  "last_article_at": "2026-06-26T10:00:00Z",
+  "created_at": "2026-06-26T02:00:00Z",
+  "constituent_article_ids": ["news-uuid-001", "news-uuid-002", "news-uuid-003"]
+}
+```
+
+**Important constraints:**
+- `overall_sentiment` must be exactly `"bullish"`, `"bearish"`, or `"neutral"`. Any other value returns `422`.
+- `last_article_at` and `created_at` must be timezone-aware (include `Z` or `+00:00`). Naive datetimes return `422`.
+- `constituent_article_ids` must contain IDs of articles that already exist in ASK's news store. Any unknown ID returns `422` naming the missing article. Ensure Workflow 2 (AI Analysis) completes before Theme Clustering runs.
+
+### Webhook Delivery Node
+
+- **Method:** POST
+- **URL:** `{{ $env.ASK_THEME_WEBHOOK_URL }}`
+- **Content-Type:** `application/json`
+- **Body:** JSON payload from the AI theme generation node
+
+**Success responses:**
+- `{"status": "created"}` — new theme (first time this `theme_id` is seen)
+- `{"status": "updated"}` — theme updated (n8n retry or re-clustering)
+
+Both are treated as success — n8n should not retry on either.
+
+### Error Handling
+
+- **On webhook 422 with `"Article not found: <id>"`:** The `constituent_article_ids` list contains an ID not yet in ASK. Either the news ingestion hasn't completed yet (retry later) or the article ID is wrong. Check Workflow 1 has run and articles exist.
+- **On webhook 422 (other):** Check `overall_sentiment` value and that all datetime fields include timezone offsets.
+- **On webhook delivery failure:** n8n retries automatically. The endpoint is idempotent — retries for the same `theme_id` return `{"status": "updated"}` and never duplicate data.
 
 ---
 

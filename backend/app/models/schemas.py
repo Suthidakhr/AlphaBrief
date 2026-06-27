@@ -185,3 +185,22 @@ class MarketThemeSummary(BaseModel):
 
 class MarketTheme(MarketThemeSummary):
     constituent_articles: list[NewsItem]
+
+
+class ThemeIngestPayload(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    theme_id: str
+    name: str
+    description: str
+    overall_sentiment: Literal["bullish", "bearish", "neutral"]
+    article_count: int
+    last_article_at: AwareDatetime
+    created_at: AwareDatetime
+    constituent_article_ids: list[str]
+
+
+class ThemeWebhookResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    status: Literal["created", "updated"]

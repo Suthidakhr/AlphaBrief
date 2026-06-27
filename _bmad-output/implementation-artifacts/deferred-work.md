@@ -1,5 +1,12 @@
 # Deferred Work Log
 
+## Deferred from: code review of 5-4-theme-clustering-webhook-and-n8n-scheduling (2026-06-26)
+
+- **D1: AwareDatetime fields stored as Python datetime objects in raw store dict** — `model_dump()` yields `datetime` objects; if the raw dict is ever JSON-serialized directly (logging, cache layer), `TypeError: Object of type datetime is not JSON serializable`. Pre-existing pattern across all stores; responses serialize via Pydantic model layer which handles this correctly. `backend/app/routers/webhooks.py:45`
+- **D2: Non-atomic check-then-upsert for constituent article validation** — Article existence is checked in a loop, then `theme_store.upsert()` is called; a concurrent `news_store.reset()` between the two could store a theme with dangling IDs. No production delete path on news_store; same pattern across all webhook handlers. `backend/app/routers/webhooks.py:39`
+- **D3: `article_count` not cross-validated against `len(constituent_article_ids)`** — Caller can supply any integer; stored as-is. Explicitly acknowledged in spec Dev Notes ("set by n8n, stored as-is"). `backend/app/models/schemas.py:196`
+- **D4: `HTTPException(422)` returns string `detail` vs Pydantic's structured list `detail`** — Clients that introspect 422 body as a list of error objects (standard FastAPI/Pydantic format) will get a string instead. Pre-existing project pattern; AC3 satisfied ("returns HTTP 422 naming the missing article ID"). `backend/app/routers/webhooks.py:41`
+
 ## Deferred from: code review of 5-3-theme-detail-page (2026-06-26)
 
 - **D1: `dateRange` NaN if `published_at` is invalid/empty** — `new Date(invalidStr).getTime()` returns NaN; `Math.min(NaN, ...)` propagates NaN → "Invalid Date" in UI. Deferred: `AwareDatetime` Pydantic validator at API boundary rejects non-ISO values; same unguarded pattern as `NewsCard.relativeTime()` already shipping. `frontend/src/components/ThemeDetailContent.tsx:7`
