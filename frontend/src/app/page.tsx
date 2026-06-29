@@ -35,7 +35,7 @@ async function HomeFeedServer() {
 async function MarketSidebarServer() {
   let overview: MarketOverview | null = null;
   let snapshot: MarketSnapshot | null = null;
-  let sectors: SectorPerformance[] = [];
+  let sectors: SectorPerformance[] | null = null;
   try {
     overview = await api.getMarketOverview();
   } catch {
@@ -49,12 +49,12 @@ async function MarketSidebarServer() {
   try {
     sectors = await api.getMarketSectors();
   } catch {
-    // sectors stay empty on failure
+    // sectors stays null — SectorHeatmap renders unavailable state
   }
   return (
     <div className="space-y-4">
       <MarketOverviewWidget snapshot={snapshot} />
-      {sectors.length > 0 && <SectorHeatmap sectors={sectors} />}
+      <SectorHeatmap sectors={sectors} />
       {overview && <TrendSummary trends={overview.trends} />}
     </div>
   );

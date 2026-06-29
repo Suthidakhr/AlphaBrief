@@ -1,14 +1,15 @@
 ---
-status: ready-for-dev
+status: done
 epic: 6
 story: 4
 story_key: "6-4-sector-heatmap-component"
 created: 2026-06-29
+baseline_commit: 52f9983e6ff95310de1f58f289911e02370b5a36
 ---
 
 # Story 6.4: SectorHeatmap Component
 
-**Status:** ready-for-dev
+**Status:** done
 
 ## Story
 
@@ -67,36 +68,43 @@ So that I can immediately identify which sector is driving market movement befor
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Rewrite `SectorHeatmap` component
-  - [ ] 1.1 Fix `clsx` import to named form: `import { clsx } from 'clsx'` (project rule violation in current code)
-  - [ ] 1.2 Import `Link` from `next/link`
-  - [ ] 1.3 Change prop from `sectors: SectorPerformance[]` to `sectors: SectorPerformance[] | null`
-  - [ ] 1.4 Add null guard → error/unavailable state with timestamped message (AC5)
-  - [ ] 1.5 Switch `DIR_STYLES` from inline hex to Tailwind tokens: `bg-positive-bg`, `bg-negative-bg`, `bg-neutral-bg`, `text-positive`, `text-negative`, `text-neutral-text` (AC2)
-  - [ ] 1.6 Fix `change_pct >= 0` (not `> 0`) for `+` prefix — consistency with MarketOverviewWidget (AC1)
-  - [ ] 1.7 Wrap each cell in `<Link href={/news?category=...}>` with focus ring class (AC3, AC6)
+- [x] Task 1: Rewrite `SectorHeatmap` component
+  - [x] 1.1 Fix `clsx` import to named form: `import { clsx } from 'clsx'` (project rule violation in current code)
+  - [x] 1.2 Import `Link` from `next/link`
+  - [x] 1.3 Change prop from `sectors: SectorPerformance[]` to `sectors: SectorPerformance[] | null`
+  - [x] 1.4 Add null guard → error/unavailable state with timestamped message (AC5)
+  - [x] 1.5 Switch `DIR_STYLES` from inline hex to Tailwind tokens: `bg-positive-bg`, `bg-negative-bg`, `bg-neutral-bg`, `text-positive`, `text-negative`, `text-neutral-text` (AC2)
+  - [x] 1.6 Fix `change_pct >= 0` (not `> 0`) for `+` prefix — consistency with MarketOverviewWidget (AC1)
+  - [x] 1.7 Wrap each cell in `<Link href={/news?category=...}>` with focus ring class (AC3, AC6)
 
-- [ ] Task 2: Export `SectorHeatmapSkeleton`
-  - [ ] 2.1 Add named export `SectorHeatmapSkeleton` to `SectorHeatmap.tsx` — same card shell + header + 3×3 `animate-pulse bg-linen` cells (AC4)
-  - [ ] 2.2 Add `role="status" aria-label="Loading sector data"` to skeleton wrapper (AC4)
+- [x] Task 2: Export `SectorHeatmapSkeleton`
+  - [x] 2.1 Add named export `SectorHeatmapSkeleton` to `SectorHeatmap.tsx` — same card shell + header + 3×3 `animate-pulse bg-linen` cells (AC4)
+  - [x] 2.2 Add `role="status" aria-label="Loading sector data"` to skeleton wrapper (AC4)
 
-- [ ] Task 3: Update call sites
-  - [ ] 3.1 `frontend/src/app/page.tsx` (`MarketSidebarServer`): change `let sectors: SectorPerformance[] = []` to `SectorPerformance[] | null = null`; update catch comment; remove `sectors.length > 0 &&` guard; render `<SectorHeatmap sectors={sectors} />`
-  - [ ] 3.2 `frontend/src/app/stocks/page.tsx`: same `null` initialization; remove `sectors.length > 0 &&` guard; render `<SectorHeatmap sectors={sectors} />`
+- [x] Task 3: Update call sites
+  - [x] 3.1 `frontend/src/app/page.tsx` (`MarketSidebarServer`): change `let sectors: SectorPerformance[] = []` to `SectorPerformance[] | null = null`; update catch comment; remove `sectors.length > 0 &&` guard; render `<SectorHeatmap sectors={sectors} />`
+  - [x] 3.2 `frontend/src/app/stocks/page.tsx`: same `null` initialization; remove `sectors.length > 0 &&` guard; render `<SectorHeatmap sectors={sectors} />`
 
-- [ ] Task 4: Update `SectorHeatmap.test.tsx`
-  - [ ] 4.1 Keep 5 existing tests (sector names, + prefix, − percentage, neutral, empty-no-throw) — they remain compatible since `SectorPerformance[]` is assignable to `SectorPerformance[] | null`
-  - [ ] 4.2 Add: null sectors renders "Sector data unavailable" (AC5)
-  - [ ] 4.3 Add: each cell is a `<Link>` (`<a>` in tests) with `href` pointing to `/news?category=...` (AC3)
-  - [ ] 4.4 Add: `change_pct: NaN` renders `"—"` not throw (AC1 — `isFinite()` guard)
-  - [ ] 4.5 Add: positive, negative, neutral Tailwind token classes present on cells (AC2)
-  - [ ] 4.6 Add: focus ring class present on each cell link (AC6)
-  - [ ] 4.7 Add: `SectorHeatmapSkeleton` renders without throwing (AC4)
-  - [ ] 4.8 Add: `SectorHeatmapSkeleton` has `role="status"` and `aria-label` (AC4)
+- [x] Task 4: Update `SectorHeatmap.test.tsx`
+  - [x] 4.1 Keep 5 existing tests (sector names, + prefix, − percentage, neutral, empty-no-throw) — they remain compatible since `SectorPerformance[]` is assignable to `SectorPerformance[] | null`
+  - [x] 4.2 Add: null sectors renders "Sector data unavailable" (AC5)
+  - [x] 4.3 Add: each cell is a `<Link>` (`<a>` in tests) with `href` pointing to `/news?category=...` (AC3)
+  - [x] 4.4 Add: `change_pct: NaN` renders `"—"` not throw (AC1 — `isFinite()` guard)
+  - [x] 4.5 Add: positive, negative, neutral Tailwind token classes present on cells (AC2)
+  - [x] 4.6 Add: focus ring class present on each cell link (AC6)
+  - [x] 4.7 Add: `SectorHeatmapSkeleton` renders without throwing (AC4)
+  - [x] 4.8 Add: `SectorHeatmapSkeleton` has `role="status"` and `aria-label` (AC4)
 
-- [ ] Task 5: Validate
-  - [ ] 5.1 `cd frontend && npx tsc --noEmit` — zero errors
-  - [ ] 5.2 `cd frontend && npx vitest run` — all tests pass (no regressions)
+- [x] Task 5: Validate
+  - [x] 5.1 `cd frontend && npx tsc --noEmit` — zero errors
+  - [x] 5.2 `cd frontend && npx vitest run` — 192/192 tests pass (9 new SectorHeatmap tests + no regressions)
+
+### Review Findings
+
+- [x] [Review][Patch] `stocks/page.tsx` sectors catch block has `/* ignore */` comment — should match page.tsx pattern: `// sectors stays null — SectorHeatmap renders unavailable state` [`frontend/src/app/stocks/page.tsx:25`]
+- [x] [Review][Defer] `SectorHeatmapSkeleton` is exported but not wired to any `<Suspense>` fallback at call sites [`frontend/src/components/SectorHeatmap.tsx:33`] — deferred, pre-existing architecture gap (W1 carried from 6.3)
+- [x] [Review][Defer] `/news?category=Thai-sector-name` navigation silently lands on unfiltered feed — news page only accepts Latin slug keys in `SLUG_TO_THAI` [`frontend/src/app/news/page.tsx`] — deferred, separate story for news routing
+- [x] [Review][Defer] Error state "Last attempted HH:MM BKK" computed at RSC render time, not exact API failure time — stale under `revalidate = 60` caching [`frontend/src/components/SectorHeatmap.tsx:50`] — deferred, same pattern as MarketOverviewWidget
 
 ---
 
@@ -448,10 +456,21 @@ Existing test for neutral (`change_pct: -0.08`) still passes since `-0.08 >= 0` 
 ## Dev Agent Record
 
 ### Completion Notes
-_To be filled by dev agent_
+
+Full rewrite of `SectorHeatmap` with all 6 ACs implemented. Key decisions:
+- Pre-existing bug fixed: `import clsx from 'clsx'` → `import { clsx } from 'clsx'` (project rule)
+- Pre-existing bug fixed: `> 0` → `>= 0` for `+` prefix (AC1 spec compliance, consistency with MarketOverviewWidget)
+- `DIR_STYLES` migrated from inline hex (`bg-[#dcfce7]`) to Tailwind tokens (`bg-positive-bg`) — tokens were already defined in `tailwind.config.ts`
+- Prop `sectors: SectorPerformance[] | null` mirrors Story 6.3's `MarketOverviewWidget` null pattern exactly
+- `return null` on empty array prevents ghost card with just a header
+- `<Link>` from next/link renders as `<a>` in tests; no `"use client"` needed
+- `encodeURIComponent(sector.sector_name)` handles Thai sector name encoding in URL
+- `SectorHeatmapSkeleton`: 3×3 grid of 6 `h-14 bg-linen animate-pulse` cells + `role="status"`
+- Both call sites (page.tsx MarketSidebarServer + stocks/page.tsx) updated: `null` init, no conditional guard
+- 5 existing tests preserved, 9 new tests added (14 total); 192/192 pass, zero TS errors
 
 ### Debug Log
-_To be filled if issues encountered_
+_No issues encountered._
 
 ---
 
@@ -461,10 +480,10 @@ _To be filled if issues encountered_
 _(none)_
 
 ### Modified Files
-- `frontend/src/components/SectorHeatmap.tsx` — rewrite: named clsx import, null prop, Link navigation, focus ring, Tailwind tokens, skeleton export, error state, constants
-- `frontend/src/components/SectorHeatmap.test.tsx` — add 8 new tests (keep 5 existing)
-- `frontend/src/app/page.tsx` — `MarketSidebarServer`: `sectors` initialized to `null`, remove conditional guard
-- `frontend/src/app/stocks/page.tsx` — `sectors` initialized to `null`, remove conditional guard
+- `frontend/src/components/SectorHeatmap.tsx` — full rewrite: named `{ clsx }` import, `null` prop, `Link` navigation, focus ring, Tailwind tokens, `SectorHeatmapSkeleton` named export, error state, card constants
+- `frontend/src/components/SectorHeatmap.test.tsx` — updated import + 9 new tests (14 total, 5 existing preserved)
+- `frontend/src/app/page.tsx` — `MarketSidebarServer`: `sectors` init from `[]` → `null`, catch comment update, unconditional `<SectorHeatmap sectors={sectors} />`
+- `frontend/src/app/stocks/page.tsx` — `sectors` init from `[]` → `null`, unconditional `<SectorHeatmap sectors={sectors} />`
 
 ---
 
@@ -473,3 +492,4 @@ _(none)_
 | Date | Event |
 |------|-------|
 | 2026-06-29 | Story created — next after Story 6.3 (MarketOverviewWidget) completion |
+| 2026-06-29 | Implementation complete — full rewrite with Link navigation, null error state, Tailwind tokens, skeleton; 192 tests pass |

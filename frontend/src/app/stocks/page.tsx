@@ -10,7 +10,7 @@ export const revalidate = 60;
 export default async function StocksPage() {
   let overview: MarketOverview | null = null;
   let snapshot: MarketSnapshot | null = null;
-  let sectors: SectorPerformance[] = [];
+  let sectors: SectorPerformance[] | null = null;
 
   try {
     overview = await api.getMarketOverview();
@@ -22,7 +22,9 @@ export default async function StocksPage() {
 
   try {
     sectors = await api.getMarketSectors();
-  } catch { /* ignore */ }
+  } catch {
+    // sectors stays null — SectorHeatmap renders unavailable state
+  }
 
   return (
     <>
@@ -56,7 +58,7 @@ export default async function StocksPage() {
             <MarketOverviewWidget snapshot={snapshot} />
           </div>
           <div className="space-y-5">
-            {sectors.length > 0 && <SectorHeatmap sectors={sectors} />}
+            <SectorHeatmap sectors={sectors} />
 
             {/* Top movers table */}
             <div className="bg-white rounded-xl border overflow-hidden" style={{ borderColor: "rgba(74,52,42,0.1)" }}>
