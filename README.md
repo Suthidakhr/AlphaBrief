@@ -23,7 +23,7 @@ graph LR
 
     subgraph Backend
         FA[FastAPI\nPython 3.13]
-        MEM[(In-Memory\nMock Data\nMVP)]
+        MEM[(In-Memory\nStore\nMVP)]
     end
 
     subgraph Frontend
@@ -37,6 +37,7 @@ graph LR
     N8N -->|POST /webhooks/daily-brief| FA
     N8N -->|POST /webhooks/themes| FA
     N8N -->|POST /webhooks/market-snapshot| FA
+    N8N -->|POST /webhooks/sector-performance| FA
     FA --> MEM
     NX -->|GET /api/*\nrevalidate: 60s| FA
 ```
@@ -98,6 +99,16 @@ App available at `http://localhost:3000`
 
 > The backend must be running before the frontend dev server for API calls to resolve.
 
+### Running Tests
+
+```bash
+# Frontend (Vitest + React Testing Library)
+cd frontend && npx vitest run
+
+# Backend (pytest + pytest-asyncio)
+cd backend && pytest
+```
+
 ---
 
 ## Project Structure
@@ -106,36 +117,100 @@ App available at `http://localhost:3000`
 ASK/
 ├── frontend/
 │   └── src/
-│       ├── app/                  # Next.js App Router pages
-│       │   ├── page.tsx          # Home (Daily Brief + News feed)
-│       │   ├── news/page.tsx     # News feed with category filter
-│       │   ├── trends/page.tsx   # Market themes
-│       │   └── stocks/page.tsx   # (maps to Trends capability)
-│       ├── components/           # Shared UI components
-│       │   ├── NewsCard.tsx
-│       │   ├── TickerBar.tsx
-│       │   ├── MarketOverviewWidget.tsx
-│       │   ├── SectorHeatmap.tsx
-│       │   └── TrendSummary.tsx
+│       ├── app/                        # Next.js App Router pages
+│       │   ├── page.tsx                # Home (Daily Brief + Market sidebar + News feed)
+│       │   ├── layout.tsx              # Root layout (Navbar, BottomTabBar, fonts)
+│       │   ├── news/
+│       │   │   ├── page.tsx            # News feed with category filter
+│       │   │   └── [id]/page.tsx       # News detail (AI analysis, sentiment, disclaimer)
+│       │   ├── trends/
+│       │   │   ├── page.tsx            # Market themes list
+│       │   │   └── [id]/page.tsx       # Theme detail with constituent articles
+│       │   ├── stocks/page.tsx         # Market overview + sector heatmap
+│       │   └── about/page.tsx          # Disclaimer and product scope
+│       ├── components/
+│       │   ├── AIInsightBox.tsx        # AI analysis block (pending/stale/available states)
+│       │   ├── AISummaryCard.tsx       # Compact AI summary for detail pages
+│       │   ├── BottomTabBar.tsx        # Mobile-only fixed nav (4 tabs)
+│       │   ├── CategoryFilterBar.tsx   # Scrollable tab filter (role="tablist")
+│       │   ├── DailyBriefCard.tsx      # Zone 1 (header/sentiment) + Zone 2 (content/disclaimer)
+│       │   ├── DailyBriefServer.tsx    # Async server wrapper for DailyBriefCard
+│       │   ├── MarketOverviewWidget.tsx # Index rows with ▲/▼ non-color indicators
+│       │   ├── N8nChat.tsx             # Embedded n8n chat widget
+│       │   ├── Navbar.tsx              # Desktop nav + Bangkok clock + LIVE badge
+│       │   ├── NewsCard.tsx            # Headline + SentimentBadge + AIInsightBox + footer
+│       │   ├── NewsDetailContent.tsx   # Full article detail layout
+│       │   ├── NewsFeed.tsx            # News list with staleness banner
+│       │   ├── SectorHeatmap.tsx       # Color cells + percentage text (WCAG 1.4.1)
+│       │   ├── SentimentBadge.tsx      # Pill: ● BULLISH / ● BEARISH / ● NEUTRAL
+│       │   ├── SkeletonCard.tsx        # Generic animate-pulse skeleton
+│       │   ├── ThemeCard.tsx           # Theme name + sentiment + article count + preview
+│       │   ├── ThemeDetailContent.tsx  # Constituent articles with AI analysis
+│       │   ├── TickerBar.tsx           # CSS marquee ticker (decorative, aria-hidden)
+│       │   └── TrendSummary.tsx        # Sidebar: top 3 themes ranked by recency
 │       ├── lib/
-│       │   └── api.ts            # All fetch calls live here (revalidate: 60)
+│       │   └── api.ts                  # All fetch calls (revalidate: 60 on every call)
 │       └── types/
-│           └── index.ts          # TypeScript types — manually synced with schemas.py
+│           └── index.ts                # TypeScript types — manually synced with schemas.py
 │
 ├── backend/
 │   └── app/
-│       ├── main.py               # FastAPI app + CORS + lifespan
+│       ├── main.py                     # FastAPI app, CORS, lifespan, router registration
+│       ├── ai/
+│       │   └── prompts.py              # Version-controlled Claude system prompt
 │       ├── models/
-│       │   └── schemas.py        # All Pydantic models (snake_case, AwareDatetime)
-│       ├── routers/              # HTTP layer only — no business logic
-│       │   ├── news.py
-│       │   ├── market.py
-│       │   └── trends.py
-│       └── services/
-│           └── mock_data.py      # In-memory data store (MVP)
+│       │   └── schemas.py              # All Pydantic models (snake_case, AwareDatetime)
+│       ├── routers/                    # HTTP layer only — no business logic
+│       │   ├── news.py                 # GET /api/news, /api/news/{id}, /api/news/categories
+│       │   ├── market.py               # GET /api/market/snapshot, /indices, /sectors, /overview
+│       │   ├── trends.py               # GET /api/trends, /api/trends/{id}
+│       │   ├── daily_brief.py          # GET /api/daily-brief
+│       │   └── webhooks.py             # POST /webhooks/* (all idempotent)
+│       └── services/                   # Business logic and in-memory stores
+│           ├── news_store.py           # NewsStore: upsert, dedup, 7-day retention
+│           ├── theme_store.py          # ThemeStore: upsert, 48h auto-archive
+│           ├── daily_brief_store.py    # DailyBriefStore: upsert by brief_date
+│           ├── market_snapshot_store.py # MarketSnapshotStore: latest snapshot
+│           ├── sector_performance_store.py # SectorPerformanceStore: latest sectors
+│           └── mock_data.py            # Seed data for local development
 │
-└── _bmad-output/planning-artifacts/   # PRD, Architecture, UX specs, Epics
+└── _bmad-output/
+    ├── project-context.md              # 91 critical implementation rules for AI agents
+    ├── planning-artifacts/             # PRD, Architecture, UX spines, Epics
+    └── implementation-artifacts/       # 28 story files + deferred-work.md
 ```
+
+---
+
+## API Reference
+
+### Read endpoints (GET)
+
+| Endpoint | Description | ISR |
+|---|---|---|
+| `GET /api/news` | News feed (7-day window, sorted by `published_at` desc) | 60s |
+| `GET /api/news/{id}` | Single news item with AI analysis | 60s |
+| `GET /api/news/categories` | Supported category list | 60s |
+| `GET /api/daily-brief` | Today's brief (falls back to yesterday if not yet generated) | 60s |
+| `GET /api/trends` | Active themes (excludes `last_article_at` > 48h) | 60s |
+| `GET /api/trends/{id}` | Theme detail with constituent articles | 60s |
+| `GET /api/market/snapshot` | Latest market snapshot (indices + tickers) | 60s |
+| `GET /api/market/overview` | Market overview with sector summary | 60s |
+| `GET /api/market/sectors` | Sector performance list | 60s |
+| `GET /api/market/indices` | Index list | 60s |
+
+### Webhook endpoints (POST — idempotent)
+
+| Endpoint | Triggered by | Dedup key |
+|---|---|---|
+| `POST /webhooks/news-ingest` | n8n on news fetch | URL + content hash |
+| `POST /webhooks/ai-analysis` | n8n after Claude analysis | article ID |
+| `POST /webhooks/daily-brief` | n8n at 07:00 Bangkok daily | `brief_date` |
+| `POST /webhooks/themes` | n8n after theme clustering | `theme_id` |
+| `POST /webhooks/market-snapshot` | n8n on market data push | replaces previous |
+| `POST /webhooks/sector-performance` | n8n on sector data push | replaces previous |
+
+Full API documentation available at `http://localhost:8000/docs` when the backend is running.
 
 ---
 
@@ -208,16 +283,31 @@ value.toFixed(2)
 
 All calls to the same endpoint in `src/lib/api.ts` use the same revalidate value. Mixing `60` and `0` for the same URL produces undefined cache behavior.
 
-**Every async Server Component needs a Suspense boundary**
+**Every async Server Component needs its own Suspense boundary**
 
 ```tsx
-// ✅ correct
-<Suspense fallback={<SkeletonCard />}>
-  <NewsFeed />
+// ✅ correct — each widget fails independently
+<Suspense fallback={<MarketOverviewWidgetSkeleton />}>
+  <MarketOverviewSection />
+</Suspense>
+<Suspense fallback={<SectorHeatmapSkeleton />}>
+  <SectorHeatmapSection />
 </Suspense>
 
-// ❌ wrong — missing boundary causes silent production failures
-<NewsFeed />
+// ❌ wrong — one failure collapses all three widgets
+<Suspense fallback={<SkeletonCard />}>
+  <MarketSidebarServer />   {/* renders 3 widgets */}
+</Suspense>
+```
+
+**The null prop pattern**
+
+Server Components that fetch data pass `ComponentProp[] | null` to their display components:
+
+```tsx
+// null  → API error  → render error state with timestamp
+// []    → empty data → render card with "No data" message
+// [...] → normal render
 ```
 
 **All datetimes are timezone-aware**
@@ -280,22 +370,25 @@ Branches: `feat/<feature>` · `fix/<issue>` · `chore/<task>`
 
 | Capability | Status | Epic |
 |---|---|---|
-| Testing infrastructure (Vitest + pytest) | Planned | Epic 1 |
-| News feed with AI analysis & sentiment | Planned | Epic 2 |
-| Category filtering (5 categories) | Planned | Epic 2 |
-| News detail page with full AI analysis | Planned | Epic 2 |
-| WCAG 2.1 AA accessibility | Planned | Epic 2 |
-| News ingestion webhook (n8n → FastAPI) | Planned | Epic 3 |
-| AI analysis delivery webhook | Planned | Epic 3 |
-| Version-controlled system prompt | Planned | Epic 3 |
-| Daily Market Brief card | Planned | Epic 4 |
-| Market Themes (Trends page) | Planned | Epic 5 |
-| Theme detail with constituent articles | Planned | Epic 5 |
-| Ticker Bar, Market Overview, Sector Heatmap | Planned | Epic 6 |
+| Testing infrastructure (Vitest + pytest) | ✅ Done | Epic 1 |
+| News feed with AI analysis & sentiment | ✅ Done | Epic 2 |
+| Category filtering (5 categories) | ✅ Done | Epic 2 |
+| News detail page with full AI analysis | ✅ Done | Epic 2 |
+| WCAG 2.1 AA accessibility | ✅ Done | Epic 2 |
+| News ingestion webhook (n8n → FastAPI) | ✅ Done | Epic 3 |
+| AI analysis delivery webhook | ✅ Done | Epic 3 |
+| Version-controlled Claude system prompt | ✅ Done | Epic 3 |
+| Daily Market Brief card | ✅ Done | Epic 4 |
+| Market Themes (Trends page) | ✅ Done | Epic 5 |
+| Theme detail with constituent articles | ✅ Done | Epic 5 |
+| Ticker Bar | ✅ Done | Epic 6 |
+| Market Overview widget | ✅ Done | Epic 6 |
+| Sector Heatmap widget | ✅ Done | Epic 6 |
+| TrendSummary sidebar widget | ✅ Done | Epic 6 |
 
 ### Out of scope for MVP
 
-User accounts · Portfolio tracking · Native mobile apps · Push notifications · AI chat · Thai-language UI · Monetization
+User accounts · Portfolio tracking · Native mobile apps · Push notifications · AI chat (beyond n8n embedded widget) · Thai-language UI · Monetization · PostgreSQL persistence (in-memory MVP only)
 
 ---
 
@@ -311,12 +404,20 @@ User accounts · Portfolio tracking · Native mobile apps · Push notifications 
 
 ---
 
-## Planning Artifacts
+## Planning & Implementation Artifacts
 
-Full planning documentation is in [`_bmad-output/planning-artifacts/`](./_bmad-output/planning-artifacts/):
+Full planning documentation is in [`_bmad-output/`](./_bmad-output/):
 
-- [`prds/prd-ASK-2026-06-20/prd.md`](./_bmad-output/planning-artifacts/prds/prd-ASK-2026-06-20/prd.md) — Product Requirements
-- [`architecture.md`](./_bmad-output/planning-artifacts/architecture.md) — Architecture decisions
-- [`epics.md`](./_bmad-output/planning-artifacts/epics.md) — 6 epics, 26 stories with acceptance criteria
-- [`ux-designs/ux-ASK-2026-06-20/DESIGN.md`](./_bmad-output/planning-artifacts/ux-designs/ux-ASK-2026-06-20/DESIGN.md) — Visual identity (DESIGN.md spine)
-- [`ux-designs/ux-ASK-2026-06-20/EXPERIENCE.md`](./_bmad-output/planning-artifacts/ux-designs/ux-ASK-2026-06-20/EXPERIENCE.md) — Behavioral specs (EXPERIENCE.md spine)
+**Planning artifacts** (`_bmad-output/planning-artifacts/`):
+- [`prds/prd-ASK-2026-06-20/prd.md`](./_bmad-output/planning-artifacts/prds/prd-ASK-2026-06-20/prd.md) — Product Requirements (29 FRs, 14 NFRs)
+- [`architecture.md`](./_bmad-output/planning-artifacts/architecture.md) — Architecture decisions with per-requirement justification
+- [`epics.md`](./_bmad-output/planning-artifacts/epics.md) — 6 epics, 28 stories with Given/When/Then acceptance criteria
+- [`ux-designs/ux-ASK-2026-06-20/DESIGN.md`](./_bmad-output/planning-artifacts/ux-designs/ux-ASK-2026-06-20/DESIGN.md) — Visual identity (authoritative)
+- [`ux-designs/ux-ASK-2026-06-20/EXPERIENCE.md`](./_bmad-output/planning-artifacts/ux-designs/ux-ASK-2026-06-20/EXPERIENCE.md) — Behavioral specs (authoritative)
+
+**Implementation artifacts** (`_bmad-output/implementation-artifacts/`):
+- `1-1-*.md` … `6-5-*.md` — 28 story files with acceptance criteria, tasks, and review findings
+- [`deferred-work.md`](./_bmad-output/implementation-artifacts/deferred-work.md) — Technical debt register: 40+ known issues with documented deferral reasons
+
+**Developer guide** (`docs/`):
+- [`bmad-workflow-guide.md`](./docs/bmad-workflow-guide.md) — End-to-end BMAD workflow case study, lessons learned, recommended process for future projects

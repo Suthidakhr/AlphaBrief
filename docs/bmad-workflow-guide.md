@@ -40,19 +40,23 @@ Think of it like this: vibe coding is asking a contractor to build you a house w
 ```
 Idea
   ↓
-[bmad-create-prd]         → Product Requirements Document (PRD)
+[bmad-create-prd]                  → Product Requirements Document (PRD)
   ↓
-[bmad-create-architecture] → Architecture Decision Document
+[bmad-create-architecture]         → Architecture Decision Document
   ↓
-[bmad-ux]                  → DESIGN.md + EXPERIENCE.md (UX spines)
+[bmad-ux]                          → DESIGN.md + EXPERIENCE.md (UX spines)
   ↓
-[bmad-create-epics-and-stories] → epics.md (6 epics, 26 stories)
+[bmad-create-epics-and-stories]    → epics.md (6 epics, 28 stories)
   ↓
 [bmad-check-implementation-readiness] → Readiness Report
   ↓
-[bmad-dev-story]           → Developer tickets (implementation phase)
+[bmad-agent-tech-writer]           → README + this guide
   ↓
-Code
+For each story:
+  [bmad-dev-story]  → Implement (red-green-refactor, all ACs satisfied)
+  [bmad-code-review] → Adversarial review (3 parallel reviewers → triage → patch)
+  ↓
+MVP Complete ✅
 ```
 
 Each step produces a document. Each document is a versioned artifact committed to git. They build on each other — later steps reference earlier ones.
@@ -171,7 +175,7 @@ DESIGN.md and EXPERIENCE.md are the single source of truth. If a mockup in `.wor
 
 **Skill:** `bmad-create-epics-and-stories`
 **Input:** PRD + Architecture + DESIGN.md + EXPERIENCE.md + project-context.md
-**Output:** `_bmad-output/planning-artifacts/epics.md` (6 epics, 26 stories)
+**Output:** `_bmad-output/planning-artifacts/epics.md` (6 epics, 28 stories)
 
 ### What this agent does
 
@@ -264,6 +268,99 @@ Paige transforms the planning artifacts into developer-facing documentation. The
 
 ---
 
+## Phase 7 — Implementation (Story by Story)
+
+**Skills:** `bmad-dev-story` + `bmad-code-review`
+**Input:** Story file from `implementation-artifacts/`
+**Output:** Committed, reviewed, tested code. Story marked `done`.
+
+This is the phase where code actually gets written — but it's the *last* phase, not the first. By the time `bmad-dev-story` runs, the dev agent has a story file with complete acceptance criteria, component specs, type definitions, and explicit rules. It doesn't have to ask questions. It implements.
+
+### The dev-story loop
+
+For each story, `bmad-dev-story` follows a strict red-green-refactor cycle:
+
+```
+1. Write failing tests (RED)    ← proves tests are meaningful
+2. Implement code (GREEN)       ← minimal to pass tests
+3. Refactor                     ← clean up with tests green
+4. Run full test suite          ← no regressions
+5. TypeScript check             ← zero errors
+```
+
+The story file's Tasks/Subtasks section is the developer's checklist. Tasks are checked off as they complete. The agent never marks a task done unless all conditions are met and tests pass.
+
+### The code-review loop
+
+After each story implementation, `bmad-code-review` runs three parallel adversarial subagents:
+
+| Reviewer | What they get | What they hunt for |
+|---|---|---|
+| **Blind Hunter** | Diff only — no context | Logic bugs, inverted conditions, null derefs, layout conflicts |
+| **Edge Case Hunter** | Diff + project read access | Boundary conditions, API contract gaps, test quality |
+| **Acceptance Auditor** | Diff + story spec | AC violations, spec deviations, missing behaviors |
+
+Each reviewer returns findings independently. The main agent then:
+1. **Deduplicates** — same bug from two reviewers → one finding
+2. **Classifies** — `patch` (fixable now), `defer` (pre-existing, out of scope), `dismiss` (false positive)
+3. **Presents** — triage summary to the developer
+4. **Applies patches** — all at once or one at a time, per developer choice
+5. **Marks done** — story file status updated, deferred items logged to `deferred-work.md`
+
+### What the code review found across ASK
+
+Over 28 stories, the adversarial reviewers surfaced findings in categories that repeat predictably:
+
+**Patterns that appeared in multiple stories:**
+- **`flex` + `block` conflict** — applying both `display: flex` and `display: block` in a single `clsx` call. `block` renders correctly in Tailwind's default output order, but is fragile. Fix: remove the redundant class.
+- **Missing `encodeURIComponent`** — template literals like `` `/trends/${theme_id}` `` are safe for UUID-style IDs but break silently if the API ever returns Thai text or slashes. Fix: wrap with `encodeURIComponent()` at the template boundary.
+- **Skeleton height mismatches** — spec says `h-3` on both sides of a row, implementation uses `h-5` for the badge placeholder. The test only checks `role="status"`, not dimensions. Found by Acceptance Auditor.
+- **Stale ISR timestamps** — `new Date()` in the error state branch is captured at server render time, then cached by ISR for up to 60s. The "Last attempted HH:MM BKK" message can be up to 60s stale. Pre-existing pattern; deferred.
+- **`SentimentBadge` crash on unknown sentiment** — `SENTIMENT_STYLES[unknown]` returns `undefined`; destructuring throws `TypeError`. Backend Pydantic enforces the enum, but the frontend has no runtime guard. Deferred to a future hardening story.
+
+**The deferred-work.md file**
+
+The reviewer classifies issues it can't fix now as `defer` — pre-existing bugs, out-of-scope improvements, or issues requiring architectural decisions. These go into `_bmad-output/implementation-artifacts/deferred-work.md` with a reason and a source story. By the end of 28 stories, this file has 40+ entries organized by story — a complete technical debt register.
+
+This file is gold. It answers "what did we know we weren't fixing?" for every code review decision made during the project.
+
+### Patterns established during implementation
+
+Some patterns were decided during implementation and became project-wide conventions:
+
+**The null prop pattern**
+
+Established in Story 6.3 and applied consistently through 6.4 and 6.5:
+
+```tsx
+// ComponentProp[] | null — the three-state contract
+// null        → API error → render error state with timestamp
+// []          → API returned empty → render card with "No data" message
+// [...items]  → normal render
+```
+
+This is different from `undefined` (prop not passed) and `[]` (empty data). The distinction is meaningful for user experience: an error should say "unavailable," not show an empty list.
+
+**Individual Suspense boundaries**
+
+Story 6.5 resolved a deferred issue from Stories 6.3 and 6.4: the old `MarketSidebarServer` wrapped three widgets in a single `<Suspense>`. One failed API call collapsed all three. The fix was three thin async functions, each with its own boundary:
+
+```tsx
+<Suspense fallback={<MarketOverviewWidgetSkeleton />}>
+  <MarketOverviewSection />   {/* fails independently */}
+</Suspense>
+<Suspense fallback={<SectorHeatmapSkeleton />}>
+  <SectorHeatmapSection />    {/* fails independently */}
+</Suspense>
+<Suspense fallback={<TrendSummarySkeleton />}>
+  <TrendSummarySection />     {/* fails independently */}
+</Suspense>
+```
+
+This is now the documented pattern for all multi-widget sidebars: one Suspense per widget.
+
+---
+
 ## Lessons Learned
 
 ### 1. The validation step is where the real value is
@@ -285,6 +382,20 @@ When the agent proposes epics, it's not just asking for a thumbs up. It's asking
 ### 5. Committing artifacts to git is not optional
 
 Planning artifacts are version-controlled deliverables. They should be in git just like code. When a future developer (or AI agent) is implementing Story 5.3 three months from now, they need to be able to check out the repo and find all the context in one place. I committed each artifact separately with a meaningful commit message.
+
+### 6. The code review is adversarial for a reason
+
+The three-reviewer model works because the reviewers don't share context. The Blind Hunter sees only the diff and finds things the spec author wouldn't notice. The Edge Case Hunter has project access and verifies type contracts and API shapes. The Acceptance Auditor checks the spec was actually implemented — not what the developer *thought* was specified.
+
+The most valuable review category is what gets **deferred**. Deferring is not giving up — it's a documented decision with a reason. "We know this pattern is fragile, we're not fixing it now, here's why" is better than ignoring it.
+
+### 7. Red-green-refactor is worth the discipline
+
+Writing tests first feels slower. It isn't. Tests written *after* implementation test the implementation's assumptions, not the spec's requirements. A test written before implementation is a specification in executable form. When the test passes, you know the feature works — not that the implementation is internally consistent.
+
+### 8. Deferred issues compound — log them immediately
+
+Every time the reviewer classifies a finding as `defer`, it goes into `deferred-work.md` with the source story and reason. At the end of 28 stories, there are 40+ entries. Without this log, those findings would be lost. With it, the next sprint starts with a prioritized list of known issues rather than a vague sense that "there's probably some stuff to clean up."
 
 ---
 
@@ -314,6 +425,10 @@ The epic and story generation is collaborative. When the agent presents Epic 3 a
 
 It takes 10 minutes and it's automated. The output is a full coverage matrix and a written verdict. There is no good reason to skip it.
 
+### Mistake 7: Skipping code review after implementation
+
+Every story should go through `bmad-code-review` before being marked done. The adversarial reviewers catch things the implementer doesn't: redundant CSS classes, missing URL encoding, spec deviations in skeleton components. The review takes 5 minutes of setup and runs in parallel. Skipping it means shipping bugs you had a chance to catch.
+
 ---
 
 ## What I Misunderstood Initially
@@ -334,6 +449,10 @@ The opposite happened. Because every story has clear acceptance criteria and eve
 
 The decision to keep Epic 2 unified was an architectural decision: don't build the same components in multiple epics. The epic structure shapes how the codebase grows. "We'll add CategoryFilterBar in Epic 2 because it shares the same page as NewsCard and NewsDetail" is an architectural constraint encoded in the epic boundary.
 
+**I thought code review was a rubber stamp at the end.**
+
+The adversarial code review is one of the most valuable steps in the implementation loop. Three independent reviewers, each with a different lens, catch different things. The Blind Hunter found a `flex`+`block` CSS conflict that would have caused layout issues on certain configurations. The Edge Case Hunter found missing `encodeURIComponent` calls in URL construction. The Acceptance Auditor found skeleton component heights that didn't match the spec. None of those would have been caught by re-reading your own code.
+
 ---
 
 ## What I Learned After Completing the Workflow
@@ -353,6 +472,14 @@ The contrast ratio fix (`camel` restricted from text roles) took 20 minutes in t
 **The readiness report is a communication tool, not just a check.**
 
 I can send `implementation-readiness-report-2026-06-20.md` to a developer starting on the project and they will know: here's what's ready, here's what's blocked, here's why. No meeting required.
+
+**`deferred-work.md` is the most underrated artifact.**
+
+At the end of 28 stories, `deferred-work.md` has 40+ entries — each one a known issue with a documented reason for deferral. It's a technical debt register built automatically, one story at a time, by the code review process. The next sprint can start with "fix D6 (SentimentBadge crash on unknown sentiment)" as a concrete, well-understood ticket. That's far more actionable than "we should do some hardening."
+
+**The null prop pattern is a design pattern, not a coincidence.**
+
+`ComponentProp[] | null` (null = error, [] = empty, [...] = data) emerged organically during Epic 6. It became an explicit project-wide convention because it matches what Server Components naturally produce when catching API errors. Once you establish a pattern like this in one story, the next story's spec can reference it explicitly — no re-invention, no inconsistency.
 
 ---
 
@@ -390,11 +517,20 @@ Day 9     bmad-agent-tech-writer (Paige)
           → Rewrite README with architecture diagram and developer guide
           → Commit each artifact to git separately with meaningful messages
 
-Week 3+: Implementation
-────────────────────────
-Day 10+   bmad-dev-story (one story at a time)
-          → Each story becomes an implementation ticket for the dev agent
+Week 3+: Implementation (repeat per story)
+────────────────────────────────────────────
+For each story:
+  bmad-dev-story
+          → Red-green-refactor cycle; don't skip writing tests first
           → Start with Epic 1 (infrastructure) before any feature work
+          → Check off tasks as you go; only mark done when all tests pass
+
+  bmad-code-review
+          → Launch 3 parallel adversarial reviewers
+          → Classify every finding: patch / defer / dismiss
+          → Apply all patches in one pass
+          → Log every defer to deferred-work.md with a reason
+          → Commit; next story
 ```
 
 ### The most important rule
@@ -419,15 +555,16 @@ Day 10+   bmad-dev-story (one story at a time)
 
 ## Quick Reference: BMAD Skills Used for ASK
 
-| Skill | Role | Key Output |
-|---|---|---|
-| `bmad-create-prd` | Product Manager | PRD with FRs, NFRs, user journeys, open questions |
-| `bmad-create-architecture` | Architect | Architecture decisions with per-requirement justification |
-| `bmad-ux` | UX Facilitator + Validator | DESIGN.md, EXPERIENCE.md, three-lens validation report |
-| `bmad-create-epics-and-stories` | Product Strategist | Epics with Given/When/Then stories and FR traceability |
-| `bmad-check-implementation-readiness` | QA Reviewer | Readiness report with coverage matrix and verdict |
-| `bmad-agent-tech-writer` (Paige) | Technical Writer | README, workflow guides, developer documentation |
-| `bmad-dev-story` | Story Executor | Developer tickets for implementation (Phase 4, not yet started) |
+| Skill | Role | Key Output | Status |
+|---|---|---|---|
+| `bmad-create-prd` | Product Manager | PRD with FRs, NFRs, user journeys, open questions | ✅ Done |
+| `bmad-create-architecture` | Architect | Architecture decisions with per-requirement justification | ✅ Done |
+| `bmad-ux` | UX Facilitator + Validator | DESIGN.md, EXPERIENCE.md, three-lens validation report | ✅ Done |
+| `bmad-create-epics-and-stories` | Product Strategist | Epics with Given/When/Then stories and FR traceability | ✅ Done — 6 epics, 28 stories |
+| `bmad-check-implementation-readiness` | QA Reviewer | Readiness report with coverage matrix and verdict | ✅ Done |
+| `bmad-agent-tech-writer` (Paige) | Technical Writer | README, workflow guides, developer documentation | ✅ Done |
+| `bmad-dev-story` | Story Executor | Red-green-refactor implementation per story | ✅ Done — all 28 stories |
+| `bmad-code-review` | Adversarial Reviewer | 3-reviewer triage → patches → deferred-work.md | ✅ Done — all 28 stories |
 
 ---
 
@@ -438,20 +575,24 @@ ASK/
 ├── README.md                                    ← Start here
 ├── _bmad-output/
 │   ├── project-context.md                       ← 91 critical implementation rules
-│   └── planning-artifacts/
-│       ├── prds/prd-ASK-2026-06-20/
-│       │   └── prd.md                           ← Product Requirements
-│       ├── architecture.md                      ← Architecture decisions
-│       ├── ux-designs/ux-ASK-2026-06-20/
-│       │   ├── DESIGN.md                        ← Visual identity (authoritative)
-│       │   ├── EXPERIENCE.md                    ← Behavioral specs (authoritative)
-│       │   └── validation-report.html           ← UX validation findings
-│       ├── epics.md                             ← All 26 stories with ACs
-│       └── implementation-readiness-report-2026-06-20.md
+│   ├── planning-artifacts/
+│   │   ├── prds/prd-ASK-2026-06-20/
+│   │   │   └── prd.md                           ← Product Requirements
+│   │   ├── architecture.md                      ← Architecture decisions
+│   │   ├── ux-designs/ux-ASK-2026-06-20/
+│   │   │   ├── DESIGN.md                        ← Visual identity (authoritative)
+│   │   │   ├── EXPERIENCE.md                    ← Behavioral specs (authoritative)
+│   │   │   └── validation-report.html           ← UX validation findings
+│   │   ├── epics.md                             ← All 28 stories with ACs
+│   │   └── implementation-readiness-report-2026-06-20.md
+│   └── implementation-artifacts/
+│       ├── 1-1-*.md … 6-5-*.md                 ← 28 story files (done)
+│       └── deferred-work.md                     ← 40+ known issues with reasons
 └── docs/
     └── bmad-workflow-guide.md                   ← This document
 ```
 
 ---
 
-*Written 2026-06-20 · ASK case study · BMAD Method v6.8.0*
+*Written 2026-06-20 · Updated 2026-06-29 · ASK case study · BMAD Method v6.8.0*
+*MVP complete: 6 epics, 28 stories implemented and reviewed*
