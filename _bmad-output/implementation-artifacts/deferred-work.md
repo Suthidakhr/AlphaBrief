@@ -9,6 +9,10 @@
 - **D5: `TickerBar` with empty `items` still renders `ticker-animate` div with zero content** — `doubled = [...items, ...items]` is `[]` when items is empty; the animated div renders with no content. CSS animation runs on a zero-width element — cosmetic flash on cold start before first snapshot is pushed. Pre-existing behavior; matches guard with `sectors.length > 0` pattern but TickerBar has no equivalent. `frontend/src/components/TickerBar.tsx`
 - **D6: `export const revalidate = 60` in `stocks/page.tsx` violates project-context rule** — Project-context.md mandates that revalidation is owned by `lib/api.ts` per-fetch only; mixing page-level `export const revalidate` causes unpredictable cache behavior. The offending line was pre-existing before Story 6.1. Remove when refactoring `stocks/page.tsx`. `frontend/src/app/stocks/page.tsx:8`
 
+## Future Enhancement: DailyBriefStore mock seed (noted 2026-06-29)
+
+- **Seed `DailyBriefStore` from a `DAILY_BRIEF` constant in `mock_data.py`** — improves local dev and demo experience; current webhook-only behavior is intentional and not a bug. Add `DAILY_BRIEF` dict to `mock_data.py` matching `DailyBriefIngestPayload` schema, then seed `daily_brief_store` at startup via a FastAPI lifespan hook in `main.py`. `backend/app/main.py`, `backend/app/services/mock_data.py`
+
 ## Deferred from: code review of 6-4-sector-heatmap-component (2026-06-29)
 
 - **W1: `SectorHeatmapSkeleton` not wired to any `<Suspense>` fallback** — The skeleton is exported per AC4 but neither `app/page.tsx` nor `stocks/page.tsx` uses it as a Suspense fallback. The existing `MarketSidebarServer` Suspense boundary uses `MarketOverviewWidgetSkeleton`. This is the same pre-existing architecture gap as 6.3-W1 (single fallback covers multiple widgets). Requires a sidebar-wide skeleton to resolve. `frontend/src/components/SectorHeatmap.tsx:33`
