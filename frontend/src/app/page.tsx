@@ -1,12 +1,12 @@
 import { Suspense } from "react";
 import { api } from "@/lib/api";
-import { MarketOverview, MarketSnapshot, NewsItem, SectorPerformance } from "@/types";
+import { MarketSnapshot, MarketThemeSummary, NewsItem, SectorPerformance } from "@/types";
 import Navbar from "@/components/Navbar";
 import TickerBar from "@/components/TickerBar";
 import NewsFeed from "@/components/NewsFeed";
 import MarketOverviewWidget, { MarketOverviewWidgetSkeleton } from "@/components/MarketOverviewWidget";
-import SectorHeatmap from "@/components/SectorHeatmap";
-import TrendSummary from "@/components/TrendSummary";
+import SectorHeatmap, { SectorHeatmapSkeleton } from "@/components/SectorHeatmap";
+import TrendSummary, { TrendSummarySkeleton } from "@/components/TrendSummary";
 import DailyBriefServer from "@/components/DailyBriefServer";
 import { DailyBriefCardSkeleton } from "@/components/DailyBriefCard";
 import SkeletonCard from "@/components/SkeletonCard";
@@ -32,32 +32,34 @@ async function HomeFeedServer() {
   );
 }
 
-async function MarketSidebarServer() {
-  let overview: MarketOverview | null = null;
+async function MarketOverviewSection() {
   let snapshot: MarketSnapshot | null = null;
-  let sectors: SectorPerformance[] | null = null;
-  try {
-    overview = await api.getMarketOverview();
-  } catch {
-    // sidebar overview stays null on failure
-  }
   try {
     snapshot = await api.getMarketSnapshot();
   } catch {
     // snapshot stays null — MarketOverviewWidget renders unavailable state
   }
+  return <MarketOverviewWidget snapshot={snapshot} />;
+}
+
+async function SectorHeatmapSection() {
+  let sectors: SectorPerformance[] | null = null;
   try {
     sectors = await api.getMarketSectors();
   } catch {
     // sectors stays null — SectorHeatmap renders unavailable state
   }
-  return (
-    <div className="space-y-4">
-      <MarketOverviewWidget snapshot={snapshot} />
-      <SectorHeatmap sectors={sectors} />
-      {overview && <TrendSummary trends={overview.trends} />}
-    </div>
-  );
+  return <SectorHeatmap sectors={sectors} />;
+}
+
+async function TrendSummarySection() {
+  let themes: MarketThemeSummary[] | null = null;
+  try {
+    themes = await api.getTrends();
+  } catch {
+    // themes stays null — TrendSummary renders unavailable state
+  }
+  return <TrendSummary themes={themes} />;
 }
 
 export default async function HomePage() {
@@ -138,7 +140,13 @@ export default async function HomePage() {
               <DailyBriefServer />
             </Suspense>
             <Suspense fallback={<MarketOverviewWidgetSkeleton />}>
-              <MarketSidebarServer />
+              <MarketOverviewSection />
+            </Suspense>
+            <Suspense fallback={<SectorHeatmapSkeleton />}>
+              <SectorHeatmapSection />
+            </Suspense>
+            <Suspense fallback={<TrendSummarySkeleton />}>
+              <TrendSummarySection />
             </Suspense>
           </div>
 
